@@ -15,7 +15,6 @@ import java.util.Date;
 import java.util.Locale;
 
 public class BMIHistoryActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,8 +23,8 @@ public class BMIHistoryActivity extends AppCompatActivity {
         LineChart lineChart = findViewById(R.id.lineChartBMI);
 
         // 讀取 BMI 歷史數據
-        SharedPreferences sharedPreferences = getSharedPreferences("BMIRecords", MODE_PRIVATE);
-        String records = sharedPreferences.getString("records", "");
+        SharedPreferences sharedPreferences = getSharedPreferences("BMIHistoryPrefs", MODE_PRIVATE);
+        String records = sharedPreferences.getString("bmiHistory", "");
 
         ArrayList<Entry> entries = new ArrayList<>();
         ArrayList<String> labels = new ArrayList<>();
@@ -41,7 +40,7 @@ public class BMIHistoryActivity extends AppCompatActivity {
                     if (parts.length >= 2) {
                         try {
                             Date date = sdf.parse(parts[0].trim());
-                            float bmi = Float.parseFloat(parts[1].trim());
+                            float bmi = Float.parseFloat(parts[1].replace("BMI: ", "").trim());
                             entries.add(new Entry(i, bmi));
                             labels.add(parts[0].trim());
                         } catch (Exception e) {
@@ -50,29 +49,20 @@ public class BMIHistoryActivity extends AppCompatActivity {
                     }
                 }
             }
-        }
 
-        // 設置圖表數據
-        LineDataSet dataSet = new LineDataSet(entries, "BMI");
-        dataSet.setColor(getResources().getColor(R.color.purple_500));
-        dataSet.setValueTextColor(getResources().getColor(R.color.black));
+            LineDataSet dataSet = new LineDataSet(entries, "BMI History");
+            LineData lineData = new LineData(dataSet);
+            lineChart.setData(lineData);
 
-        LineData lineData = new LineData(dataSet);
-        lineChart.setData(lineData);
-
-        // 配置 X 軸
-        XAxis xAxis = lineChart.getXAxis();
-        xAxis.setGranularity(1f);
-        xAxis.setValueFormatter(new ValueFormatter() {
-            @Override
-            public String getFormattedValue(float value) {
-                if (value >= 0 && value < labels.size()) {
+            XAxis xAxis = lineChart.getXAxis();
+            xAxis.setValueFormatter(new ValueFormatter() {
+                @Override
+                public String getFormattedValue(float value) {
                     return labels.get((int) value);
                 }
-                return "";
-            }
-        });
+            });
 
-        lineChart.invalidate(); // 刷新圖表
+            lineChart.invalidate(); // Refresh the chart
+        }
     }
 }

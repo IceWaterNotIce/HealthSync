@@ -97,7 +97,7 @@ public class BMICalculatorActivity extends AppCompatActivity {
     private void saveToHistory(String record) {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String existingHistory = prefs.getString(HISTORY_KEY, "");
-        String updatedHistory = existingHistory.isEmpty() ? record : existingHistory + "\n\n" + record;
+        String updatedHistory = existingHistory.isEmpty() ? record : existingHistory + "\n" + record;
 
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(HISTORY_KEY, updatedHistory);
@@ -114,7 +114,9 @@ public class BMICalculatorActivity extends AppCompatActivity {
     private void calculateAndSaveBMI(double weight, double height) {
         double bmi = weight / (height * height);
         saveBMI(bmi);
-        // 顯示 BMI 結果
-        // ...existing code...
+
+        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+        String record = String.format("%s - BMI: %.2f", date, bmi);
+        saveToHistory(record);
     }
 }

@@ -87,7 +87,7 @@ public class FoodHistoryActivity extends AppCompatActivity {
                     return labels.get((int) value);
                 }
                 return "";
-            }a
+            }
         });
 
         lineChart.invalidate(); // 刷新圖表
