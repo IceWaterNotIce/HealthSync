@@ -117,14 +117,18 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("FoodRecords", MODE_PRIVATE);
         String records = sharedPreferences.getString("records", "");
 
-        if (records.isEmpty()) {
+        if (records.trim().isEmpty()) { // 修正條件，確保空記錄不會進一步處理
             return "尚無飲食記錄。建議每餐攝取 500-700 kcal，並保持 4 小時的間隔。";
         }
 
         String[] recordArray = records.split("\n");
-        String lastRecord = recordArray[recordArray.length - 1];
-        String[] lastRecordParts = lastRecord.split(" - ");
+        String lastRecord = recordArray[recordArray.length - 1].trim();
 
+        if (lastRecord.isEmpty() || !lastRecord.contains(" - ")) { // 檢查記錄是否有效
+            return "記錄格式錯誤或記錄為空，無法建議";
+        }
+
+        String[] lastRecordParts = lastRecord.split(" - ");
         if (lastRecordParts.length < 3) {
             return "記錄格式錯誤，無法建議";
         }
