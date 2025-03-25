@@ -37,7 +37,8 @@ public class BMICalculatorActivity extends AppCompatActivity {
                 if (!weightStr.isEmpty() && !heightStr.isEmpty()) {
                     double weight = Double.parseDouble(weightStr);
                     double height = Double.parseDouble(heightStr);
-                    double bmi = weight / (height * height);
+                    double bmi = weight / (height * height); // 定義 bmi 變數
+                    calculateAndSaveBMI(weight, height);
 
                     String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
                     String record = String.format("Date: %s\nWeight: %.2f kg, Height: %.2f m, BMI: %.2f", date, weight, height, bmi);
@@ -101,5 +102,19 @@ public class BMICalculatorActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(HISTORY_KEY, updatedHistory);
         editor.apply();
+    }
+
+    private void saveBMI(double bmi) {
+        SharedPreferences sharedPreferences = getSharedPreferences("BMIRecords", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("lastBMI", String.valueOf(bmi));
+        editor.apply();
+    }
+
+    private void calculateAndSaveBMI(double weight, double height) {
+        double bmi = weight / (height * height);
+        saveBMI(bmi);
+        // 顯示 BMI 結果
+        // ...existing code...
     }
 }

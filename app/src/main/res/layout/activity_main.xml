@@ -18,13 +18,25 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 新增 TextView 用於顯示目標 BMI -->
+    <TextView
+        android:id="@+id/targetBMITextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="建議目標 BMI: "
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintTop_toBottomOf="@id/btnBMI"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- 新增按鈕用於新增飲食記錄 -->
     <Button
         android:id="@+id/btnAddFood"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="新增飲食記錄"
-        app:layout_constraintTop_toBottomOf="@id/btnBMI"
+        app:layout_constraintTop_toBottomOf="@id/targetBMITextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
