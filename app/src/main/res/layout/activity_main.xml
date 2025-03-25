@@ -8,62 +8,15 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <!-- 按鈕用於拍照或選擇圖片 -->
-    <Button
-        android:id="@+id/btnCaptureOrSelect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="拍照或選擇圖片"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- 用於顯示選擇的圖片 -->
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="0dp"
-        android:layout_height="200dp"
-        android:layout_marginTop="16dp"
-        android:scaleType="centerCrop"
-        android:contentDescription="選擇的圖片"
-        app:layout_constraintTop_toBottomOf="@id/btnCaptureOrSelect"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- 用於顯示卡路里信息 -->
-    <TextView
-        android:id="@+id/textViewCalories"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="卡路里信息"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/imageView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- 用於顯示 API 回應 -->
-    <TextView
-        android:id="@+id/textViewResponse"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="回應將顯示在這裡"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/textViewCalories"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
     <!-- 新增按鈕用於導航到 BMI 計算器 -->
     <Button
         android:id="@+id/btnBMI"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="BMI 計算器"
-        app:layout_constraintTop_toBottomOf="@id/textViewResponse"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- 新增按鈕用於新增飲食記錄 -->
     <Button
@@ -83,6 +36,17 @@
         android:layout_height="wrap_content"
         android:text="查看歷史記錄"
         app:layout_constraintTop_toBottomOf="@id/btnAddFood"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
+    <!-- 新增按鈕用於導航到 PhotoKcalActivity -->
+    <Button
+        android:id="@+id/btnPhotoKcal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="照片卡路里"
+        app:layout_constraintTop_toBottomOf="@id/btnViewHistory"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />

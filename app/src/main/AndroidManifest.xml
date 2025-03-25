@@ -27,6 +27,7 @@
         <activity android:name=".BMIHistoryActivity" />
         <activity android:name=".AddFoodActivity" />
         <activity android:name=".FoodHistoryActivity" />
+        <activity android:name=".PhotoKcalActivity" />
     </application>
 
 </manifest>
