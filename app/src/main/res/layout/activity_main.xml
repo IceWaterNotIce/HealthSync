@@ -54,4 +54,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- 新增按鈕用於導航到 BMI 計算器 -->
+    <Button
+        android:id="@+id/btnBMI"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="BMI 計算器"
+        app:layout_constraintTop_toBottomOf="@id/textViewResponse"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

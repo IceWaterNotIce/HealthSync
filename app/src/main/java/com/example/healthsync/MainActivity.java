@@ -100,6 +100,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 新增按鈕導航到 BMI 計算器
+        Button btnBMI = findViewById(R.id.btnBMI);
+        btnBMI.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, BMICalculatorActivity.class);
+                startActivity(intent);
+            }
+        });
+
         // 請求權限
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
     }
