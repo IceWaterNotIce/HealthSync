@@ -44,7 +44,18 @@ public class BMICalculatorActivity extends AppCompatActivity {
 
                     saveToHistory(record);
 
-                    resultText.setText(String.format("Your BMI: %.2f", bmi));
+                    String bmiMessage;
+                    if (bmi < 18.5) {
+                        bmiMessage = "Your BMI: %.2f (Underweight)";
+                    } else if (bmi >= 18.5 && bmi <= 24.9) {
+                        bmiMessage = "Your BMI: %.2f (Normal weight)";
+                    } else if (bmi >= 25 && bmi <= 29.9) {
+                        bmiMessage = "Your BMI: %.2f (Overweight)";
+                    } else {
+                        bmiMessage = "Your BMI: %.2f (Obese)";
+                    }
+
+                    resultText.setText(String.format(bmiMessage, bmi));
                 } else {
                     resultText.setText("Please enter valid weight and height.");
                 }
