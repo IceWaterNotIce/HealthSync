@@ -7,20 +7,19 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class FoodHistoryActivity extends AppCompatActivity {
 
-    private TextView textViewHistory;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_food_history);
 
-        textViewHistory = findViewById(R.id.textViewHistory);
-        loadFoodHistory();
+        // 修正 ID 為 historyTextView
+        TextView historyTextView = findViewById(R.id.historyTextView);
+        loadFoodHistory(historyTextView);
     }
 
-    private void loadFoodHistory() {
+    private void loadFoodHistory(TextView historyTextView) {
         SharedPreferences sharedPreferences = getSharedPreferences("FoodRecords", MODE_PRIVATE);
         String records = sharedPreferences.getString("records", "尚無記錄");
-        textViewHistory.setText(records);
+        historyTextView.setText(records);
     }
 }

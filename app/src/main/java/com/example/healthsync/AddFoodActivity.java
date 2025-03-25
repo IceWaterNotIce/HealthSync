@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,6 +21,13 @@ public class AddFoodActivity extends AppCompatActivity {
         editTextFoodName = findViewById(R.id.editTextFoodName);
         editTextCalories = findViewById(R.id.editTextCalories);
         Button btnSave = findViewById(R.id.btnSave);
+
+        // 接收日期和時間
+        String dateTime = getIntent().getStringExtra("dateTime");
+
+        // 顯示日期和時間
+        TextView dateTimeTextView = findViewById(R.id.dateTimeTextView);
+        dateTimeTextView.setText(dateTime);
 
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -44,7 +52,8 @@ public class AddFoodActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
 
         String existingRecords = sharedPreferences.getString("records", "");
-        String newRecord = foodName + " - " + calories + " kcal\n";
+        String dateTime = getIntent().getStringExtra("dateTime");
+        String newRecord = dateTime + " - " + foodName + " - " + calories + " kcal\n";
         editor.putString("records", existingRecords + newRecord);
         editor.apply();
     }

@@ -5,6 +5,15 @@
     android:orientation="vertical"
     android:padding="16dp">
 
+    <!-- 顯示日期和時間 -->
+    <TextView
+        android:id="@+id/dateTimeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Date and Time"
+        android:textSize="16sp"
+        android:layout_marginBottom="16dp" />
+
     <EditText
         android:id="@+id/editTextFoodName"
         android:layout_width="match_parent"

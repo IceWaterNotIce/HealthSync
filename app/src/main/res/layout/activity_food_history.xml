@@ -5,9 +5,10 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/textViewHistory"
+        android:id="@+id/historyTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="歷史記錄"
-        android:textSize="16sp" />
+        android:textSize="16sp"
+        android:padding="8dp" />
 </LinearLayout>

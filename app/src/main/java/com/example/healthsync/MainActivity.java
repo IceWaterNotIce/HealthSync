@@ -7,6 +7,9 @@ import android.view.View; // 修正導入 View 的問題
 import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +34,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AddFoodActivity.class);
+                // 新增當前日期和時間
+                String currentDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+                intent.putExtra("dateTime", currentDateTime);
                 startActivity(intent);
             }
         });
