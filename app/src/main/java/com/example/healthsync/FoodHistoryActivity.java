@@ -83,11 +83,11 @@ public class FoodHistoryActivity extends AppCompatActivity {
         xAxis.setValueFormatter(new ValueFormatter() {
             @Override
             public String getFormattedValue(float value) {
-                if (value >= 0 && value < labels.sa  ize()) {
+                if (value >= 0 && value < labels.size()) { // 修正拼寫錯誤
                     return labels.get((int) value);
                 }
                 return "";
-            }
+            }a
         });
 
         lineChart.invalidate(); // 刷新圖表
