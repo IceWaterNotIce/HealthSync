@@ -70,6 +70,11 @@ public class MainActivity extends AppCompatActivity {
 
         // 請求權限
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+
+        // 建議下一餐
+        TextView suggestionTextView = findViewById(R.id.suggestionTextView);
+        String suggestion = suggestNextMeal();
+        suggestionTextView.setText(suggestion);
     }
 
     // 計算目標 BMI
@@ -93,6 +98,41 @@ public class MainActivity extends AppCompatActivity {
             }
         } catch (NumberFormatException e) {
             return "無法建議 (記錄格式錯誤)";
+        }
+    }
+
+    private String suggestNextMeal() {
+        SharedPreferences sharedPreferences = getSharedPreferences("FoodRecords", MODE_PRIVATE);
+        String records = sharedPreferences.getString("records", "");
+
+        if (records.isEmpty()) {
+            return "尚無飲食記錄，建議每餐攝取 500-700 kcal，間隔約 4 小時";
+        }
+
+        String[] recordArray = records.split("\n");
+        String lastRecord = recordArray[recordArray.length - 1];
+        String[] lastRecordParts = lastRecord.split(" - ");
+
+        if (lastRecordParts.length < 3) {
+            return "記錄格式錯誤，無法建議";
+        }
+
+        String lastTime = lastRecordParts[0].trim();
+        String lastCalories = lastRecordParts[2].replace(" kcal", "").trim();
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            Date lastDate = sdf.parse(lastTime);
+            long timeSinceLastMeal = (new Date().getTime() - lastDate.getTime()) / (1000 * 60 * 60);
+
+            int suggestedCalories = 600; // 預設建議熱量
+            if (timeSinceLastMeal >= 4) {
+                suggestedCalories += 100; // 如果超過 4 小時，增加熱量建議
+            }
+
+            return "建議下一餐攝取 " + suggestedCalories + " kcal，並在 " + Math.max(0, 4 - timeSinceLastMeal) + " 小時內進食";
+        } catch (Exception e) {
+            return "無法解析記錄時間，無法建議";
         }
     }
 }
