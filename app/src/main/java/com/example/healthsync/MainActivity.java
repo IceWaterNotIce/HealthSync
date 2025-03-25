@@ -88,6 +88,15 @@ public class MainActivity extends AppCompatActivity {
         suggestionTextView.setText(suggestion);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // 在返回主畫面時刷新建議文字
+        TextView suggestionTextView = findViewById(R.id.suggestionTextView);
+        String suggestion = suggestNextMeal();
+        suggestionTextView.setText(suggestion);
+    }
+
     // 計算目標 BMI
     private String calculateTargetBMI() {
         SharedPreferences sharedPreferences = getSharedPreferences("BMIRecords", MODE_PRIVATE);
