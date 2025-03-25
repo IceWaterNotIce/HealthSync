@@ -25,6 +25,8 @@
         </activity>
         <activity android:name=".BMICalculatorActivity" />
         <activity android:name=".BMIHistoryActivity" />
+        <activity android:name=".AddFoodActivity" />
+        <activity android:name=".FoodHistoryActivity" />
     </application>
 
 </manifest>

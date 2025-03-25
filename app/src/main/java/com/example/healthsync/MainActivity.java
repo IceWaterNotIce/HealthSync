@@ -110,6 +110,26 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 新增按鈕導航到新增飲食記錄
+        Button btnAddFood = findViewById(R.id.btnAddFood);
+        btnAddFood.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, AddFoodActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        // 新增按鈕導航到查看歷史記錄
+        Button btnViewHistory = findViewById(R.id.btnViewHistory);
+        btnViewHistory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, FoodHistoryActivity.class);
+                startActivity(intent);
+            }
+        });
+
         // 請求權限
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
     }
