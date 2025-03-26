@@ -28,34 +28,6 @@
                 android:elevation="2dp"
                 android:layout_marginBottom="16dp" />
 
-            <Button
-                android:id="@+id/btnBMI"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="BMI 計算器"
-                android:layout_marginBottom="8dp" />
-
-            <Button
-                android:id="@+id/btnAddFood"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="新增飲食記錄"
-                android:layout_marginBottom="8dp" />
-
-            <Button
-                android:id="@+id/btnViewHistory"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="查看歷史記錄"
-                android:layout_marginBottom="8dp" />
-
-            <Button
-                android:id="@+id/btnPhotoKcal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="拍照熱量計算"
-                android:layout_marginBottom="16dp" />
-
             <TextView
                 android:id="@+id/suggestionTextView"
                 android:layout_width="match_parent"

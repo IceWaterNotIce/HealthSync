@@ -36,58 +36,6 @@ public class MainActivity extends BaseActivity {
         String targetBMI = calculateTargetBMI();
         targetBMITextView.setText("建議目標 BMI: " + targetBMI);
 
-        // 改進按鈕的外觀和狀態變化
-        Button btnBMI = findViewById(R.id.btnBMI);
-        btnBMI.setBackgroundColor(Color.parseColor("#4CAF50")); // 設置按鈕背景顏色
-        btnBMI.setTextColor(Color.WHITE); // 設置按鈕文字顏色
-        btnBMI.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "導航到 BMI 計算器", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MainActivity.this, BMICalculatorActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        Button btnAddFood = findViewById(R.id.btnAddFood);
-        btnAddFood.setBackgroundColor(Color.parseColor("#FF9800"));
-        btnAddFood.setTextColor(Color.WHITE);
-        btnAddFood.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "導航到新增飲食記錄", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MainActivity.this, AddFoodActivity.class);
-                // 新增當前日期和時間
-                String currentDateTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-                intent.putExtra("dateTime", currentDateTime);
-                startActivity(intent);
-            }
-        });
-
-        Button btnViewHistory = findViewById(R.id.btnViewHistory);
-        btnViewHistory.setBackgroundColor(Color.parseColor("#2196F3"));
-        btnViewHistory.setTextColor(Color.WHITE);
-        btnViewHistory.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "導航到查看歷史記錄", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MainActivity.this, FoodHistoryActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        Button btnPhotoKcal = findViewById(R.id.btnPhotoKcal);
-        btnPhotoKcal.setBackgroundColor(Color.parseColor("#9C27B0"));
-        btnPhotoKcal.setTextColor(Color.WHITE);
-        btnPhotoKcal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "導航到拍照熱量計算", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MainActivity.this, PhotoKcalActivity.class);
-                startActivity(intent);
-            }
-        });
-
         // 請求權限
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
 
