@@ -1,4 +1,4 @@
-package com.example.healthsync;
+package com.icewaternotice.healthsync;
 
 import android.Manifest;
 import android.content.Intent;
