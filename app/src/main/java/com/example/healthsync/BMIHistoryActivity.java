@@ -1,7 +1,13 @@
 package com.example.healthsync;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -21,13 +27,18 @@ public class BMIHistoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_bmi_history);
 
         LineChart lineChart = findViewById(R.id.lineChartBMI);
+        ListView bmiHistoryList = findViewById(R.id.bmi_history_list);
 
-        // 讀取 BMI 歷史數據
+        // Read BMI history data
         SharedPreferences sharedPreferences = getSharedPreferences("BMIHistoryPrefs", MODE_PRIVATE);
         String records = sharedPreferences.getString("bmiHistory", "");
 
+        // Log the retrieved history for debugging
+        Log.d("BMIHistoryActivity", "Retrieved BMI History: " + records);
+
         ArrayList<Entry> entries = new ArrayList<>();
         ArrayList<String> labels = new ArrayList<>();
+        ArrayList<String> historyList = new ArrayList<>();
 
         if (!records.trim().isEmpty()) {
             String[] recordArray = records.split("\n");
@@ -43,6 +54,7 @@ public class BMIHistoryActivity extends AppCompatActivity {
                             float bmi = Float.parseFloat(parts[1].replace("BMI: ", "").trim());
                             entries.add(new Entry(i, bmi));
                             labels.add(parts[0].trim());
+                            historyList.add(record); // Add record to history list
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -64,5 +76,20 @@ public class BMIHistoryActivity extends AppCompatActivity {
 
             lineChart.invalidate(); // Refresh the chart
         }
+
+        // Populate the ListView with BMI history
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, historyList);
+        bmiHistoryList.setAdapter(adapter);
+
+        // Add a return button to navigate back to BMIActivity
+        Button returnButton = findViewById(R.id.btnReturnToBMI);
+        returnButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(BMIHistoryActivity.this, BMIActivity.class);
+                startActivity(intent);
+                finish(); // Close the current activity
+            }
+        });
     }
 }

@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_food"
+        android:icon="@drawable/ic_food"
+        android:title="Food" />
+    <item
+        android:id="@+id/nav_home"
+        android:icon="@drawable/ic_home"
+        android:title="Home" />
+    <item
+        android:id="@+id/nav_bmi"
+        android:icon="@drawable/ic_bmi"
+        android:title="BMI" />
+</menu>

@@ -28,6 +28,8 @@
         <activity android:name=".AddFoodActivity" />
         <activity android:name=".FoodHistoryActivity" />
         <activity android:name=".PhotoKcalActivity" />
+        <activity android:name=".FoodActivity" />
+        <activity android:name=".BMIActivity" />
     </application>
 
 </manifest>

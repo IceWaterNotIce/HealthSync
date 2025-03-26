@@ -15,12 +15,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected int getCurrentMenuItemId() {
+        return R.id.nav_home; // Ensure this matches the "Home" menu item ID
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         // 顯示目標 BMI
         TextView targetBMITextView = findViewById(R.id.targetBMITextView);

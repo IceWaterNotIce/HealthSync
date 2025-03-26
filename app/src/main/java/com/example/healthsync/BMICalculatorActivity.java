@@ -3,120 +3,108 @@ package com.example.healthsync;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
+import android.widget.Toast;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class BMICalculatorActivity extends AppCompatActivity {
+public class BMICalculatorActivity extends BaseActivity {
 
-    private static final String PREFS_NAME = "BMIHistoryPrefs";
-    private static final String HISTORY_KEY = "bmiHistory";
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_bmi_calculator;
+    }
+
+    @Override
+    protected int getCurrentMenuItemId() {
+        return R.id.nav_bmi;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bmi_calculator);
 
-        EditText weightInput = findViewById(R.id.weight_input);
-        EditText heightInput = findViewById(R.id.height_input);
-        Button calculateButton = findViewById(R.id.calculate_button);
-        TextView resultText = findViewById(R.id.result_text);
+        EditText etHeight = findViewById(R.id.etHeight);
+        EditText etWeight = findViewById(R.id.etWeight);
+        TextView tvBMIResult = findViewById(R.id.tvBMIResult);
+        Button btnCalculateBMI = findViewById(R.id.btnCalculateBMI);
+        Button returnButton = findViewById(R.id.btnReturnToBMI);
 
-        calculateButton.setOnClickListener(new View.OnClickListener() {
+        // Handle BMI calculation
+        btnCalculateBMI.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String weightStr = weightInput.getText().toString();
-                String heightStr = heightInput.getText().toString();
+                String heightStr = etHeight.getText().toString().trim();
+                String weightStr = etWeight.getText().toString().trim();
 
-                if (!weightStr.isEmpty() && !heightStr.isEmpty()) {
-                    double weight = Double.parseDouble(weightStr);
-                    double height = Double.parseDouble(heightStr);
-                    double bmi = weight / (height * height); // 定義 bmi 變數
-                    calculateAndSaveBMI(weight, height);
+                if (heightStr.isEmpty() || weightStr.isEmpty()) {
+                    Toast.makeText(BMICalculatorActivity.this, "Please enter both height and weight.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
-                    String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-                    String record = String.format("Date: %s\nWeight: %.2f kg, Height: %.2f m, BMI: %.2f", date, weight, height, bmi);
+                try {
+                    float height = Float.parseFloat(heightStr) / 100; // Convert cm to meters
+                    float weight = Float.parseFloat(weightStr);
+                    float bmi = weight / (height * height);
 
-                    saveToHistory(record);
-
-                    String bmiMessage;
+                    String bmiCategory;
                     if (bmi < 18.5) {
-                        bmiMessage = "Your BMI: %.2f (Underweight)";
-                    } else if (bmi >= 18.5 && bmi <= 24.9) {
-                        bmiMessage = "Your BMI: %.2f (Normal weight)";
-                    } else if (bmi >= 25 && bmi <= 29.9) {
-                        bmiMessage = "Your BMI: %.2f (Overweight)";
+                        bmiCategory = "Underweight";
+                    } else if (bmi >= 18.5 && bmi < 24.9) {
+                        bmiCategory = "Normal weight";
+                    } else if (bmi >= 25 && bmi < 29.9) {
+                        bmiCategory = "Overweight";
                     } else {
-                        bmiMessage = "Your BMI: %.2f (Obese)";
+                        bmiCategory = "Obesity";
                     }
 
-                    resultText.setText(String.format(bmiMessage, bmi));
-                } else {
-                    resultText.setText("Please enter valid weight and height.");
+                    String result = String.format("Your BMI: %.2f (%s)", bmi, bmiCategory);
+                    tvBMIResult.setText(result);
+
+                    // Save BMI to history
+                    saveBMIToHistory(bmi);
+
+                } catch (NumberFormatException e) {
+                    Toast.makeText(BMICalculatorActivity.this, "Invalid input. Please enter valid numbers.", Toast.LENGTH_SHORT).show();
                 }
             }
         });
 
-        // 新增按鈕查看 BMI 歷史
-        Button historyButton = new Button(this);
-        historyButton.setText("查看 BMI 歷史");
-        historyButton.setOnClickListener(new View.OnClickListener() {
+        // Add a return button to navigate back to BMIActivity
+        returnButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(BMICalculatorActivity.this, BMIHistoryActivity.class);
+                Intent intent = new Intent(BMICalculatorActivity.this, BMIActivity.class);
                 startActivity(intent);
+                finish(); // Close the current activity
             }
         });
-
-        // 將歷史按鈕動態添加到佈局
-        LinearLayout layout = findViewById(R.id.bmi_calculator_layout);
-        layout.addView(historyButton);
-
-        // 新增按鈕返回主頁面
-        Button backButton = new Button(this);
-        backButton.setText("返回主頁面");
-        backButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(BMICalculatorActivity.this, MainActivity.class);
-                startActivity(intent);
-                finish(); // Optional: Close the current activity
-            }
-        });
-
-        // 將返回按鈕動態添加到佈局
-        layout.addView(backButton);
     }
 
-    private void saveToHistory(String record) {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        String existingHistory = prefs.getString(HISTORY_KEY, "");
-        String updatedHistory = existingHistory.isEmpty() ? record : existingHistory + "\n" + record;
-
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(HISTORY_KEY, updatedHistory);
-        editor.apply();
-    }
-
-    private void saveBMI(double bmi) {
-        SharedPreferences sharedPreferences = getSharedPreferences("BMIRecords", MODE_PRIVATE);
+    private void saveBMIToHistory(float bmi) {
+        SharedPreferences sharedPreferences = getSharedPreferences("BMIHistoryPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("lastBMI", String.valueOf(bmi));
+
+        // Get the current date
+        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+
+        // Append the new BMI record to the existing history
+        String existingHistory = sharedPreferences.getString("bmiHistory", "");
+        String newRecord = currentDate + " - BMI: " + String.format("%.2f", bmi);
+        String updatedHistory = existingHistory.isEmpty() ? newRecord : existingHistory + "\n" + newRecord;
+
+        editor.putString("bmiHistory", updatedHistory);
         editor.apply();
-    }
 
-    private void calculateAndSaveBMI(double weight, double height) {
-        double bmi = weight / (height * height);
-        saveBMI(bmi);
+        // Log the updated history for debugging
+        Log.d("BMICalculatorActivity", "Updated BMI History: " + updatedHistory);
 
-        String date = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-        String record = String.format("%s - BMI: %.2f", date, bmi);
-        saveToHistory(record);
+        Toast.makeText(this, "BMI saved to history.", Toast.LENGTH_SHORT).show();
     }
 }
