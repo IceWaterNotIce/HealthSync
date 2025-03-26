@@ -45,12 +45,26 @@ public class SettingActivity extends BaseActivity {
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
             displayAccountInfo(account, txtAccountInfo, imgProfilePicture);
+            btnLinkGoogleAccount.setText("Unlink Google Account");
+        } else {
+            btnLinkGoogleAccount.setText("Link Google Account");
         }
 
-        // Handle button click for Google Sign-In
+        // Handle button click for Google Sign-In/Sign-Out
         btnLinkGoogleAccount.setOnClickListener(v -> {
-            Intent signInIntent = googleSignInClient.getSignInIntent();
-            startActivityForResult(signInIntent, RC_SIGN_IN);
+            GoogleSignInAccount currentAccount = GoogleSignIn.getLastSignedInAccount(this);
+            if (currentAccount != null) {
+                // Unlink account
+                googleSignInClient.signOut().addOnCompleteListener(task -> {
+                    txtAccountInfo.setText("No account linked.");
+                    imgProfilePicture.setImageResource(R.drawable.default_profile_picture); // Fallback image
+                    btnLinkGoogleAccount.setText("Link Google Account");
+                });
+            } else {
+                // Link account
+                Intent signInIntent = googleSignInClient.getSignInIntent();
+                startActivityForResult(signInIntent, RC_SIGN_IN);
+            }
         });
     }
 
@@ -62,10 +76,12 @@ public class SettingActivity extends BaseActivity {
             task.addOnCompleteListener(this, completedTask -> {
                 TextView txtAccountInfo = findViewById(R.id.txtAccountInfo);
                 ImageView imgProfilePicture = findViewById(R.id.imgProfilePicture);
+                Button btnLinkGoogleAccount = findViewById(R.id.btnLinkGoogleAccount);
                 if (completedTask.isSuccessful()) {
                     GoogleSignInAccount account = completedTask.getResult();
                     if (account != null) {
                         displayAccountInfo(account, txtAccountInfo, imgProfilePicture);
+                        btnLinkGoogleAccount.setText("Unlink Google Account");
                     } else {
                         txtAccountInfo.setText("Account retrieval failed: Account is null.");
                     }
