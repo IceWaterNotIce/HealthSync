@@ -90,21 +90,16 @@ public class MainActivity extends BaseActivity {
     // 改進建議文字的表達
     private String suggestNextMeal() {
         SharedPreferences sharedPreferences = getSharedPreferences("FoodRecords", MODE_PRIVATE);
-        String records = sharedPreferences.getString("records", "");
+        String records = sharedPreferences.getString("records", "").trim();
 
-        if (records.trim().isEmpty()) {
+        if (records.isEmpty()) {
             return "尚無飲食記錄。建議每餐攝取 500-700 kcal，並保持 4 小時的間隔。";
         }
 
-        // 修正記錄中可能存在的多餘空格
         String[] recordArray = records.split("\n");
-        for (int i = 0; i < recordArray.length; i++) {
-            recordArray[i] = recordArray[i].trim().replaceAll("\\s{2,}", " "); // 移除多餘空格
-        }
+        String lastRecord = recordArray[recordArray.length - 1].trim();
 
-        String lastRecord = recordArray[recordArray.length - 1];
-
-        if (lastRecord.isEmpty() || !lastRecord.contains(" - ")) {
+        if (!lastRecord.contains(" - ")) {
             return "記錄格式錯誤或記錄為空，無法建議";
         }
 
@@ -114,7 +109,7 @@ public class MainActivity extends BaseActivity {
         }
 
         String lastTime = lastRecordParts[0].trim();
-        String lastCalories = lastRecordParts[2].replaceAll("[^0-9]", ""); // 僅提取數字部分
+        String lastCalories = lastRecordParts[2].replaceAll("[^0-9]", "").trim();
 
         if (lastTime.isEmpty() || lastCalories.isEmpty()) {
             return "記錄格式錯誤，無法建議";
@@ -125,9 +120,9 @@ public class MainActivity extends BaseActivity {
             Date lastDate = sdf.parse(lastTime);
             long timeSinceLastMeal = (new Date().getTime() - lastDate.getTime()) / (1000 * 60 * 60);
 
-            int suggestedCalories = 600; // 預設建議熱量
+            int suggestedCalories = 600;
             if (timeSinceLastMeal >= 4) {
-                suggestedCalories += 100; // 如果超過 4 小時，增加熱量建議
+                suggestedCalories += 100;
             }
 
             return "距離上次進食已過 " + timeSinceLastMeal + " 小時。建議下一餐攝取 " + suggestedCalories + " kcal，並在 " + Math.max(0, 4 - timeSinceLastMeal) + " 小時內進食。";
