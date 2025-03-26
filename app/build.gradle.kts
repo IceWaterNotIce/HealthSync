@@ -40,6 +40,8 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation("com.github.PhilJay:MPAndroidChart:3.1.0") // 修正版本號格式
     implementation("com.google.android.gms:play-services-auth:20.7.0") // 新增 Google Sign-In 依賴
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

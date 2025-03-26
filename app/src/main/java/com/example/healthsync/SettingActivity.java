@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Button;
+import android.widget.ImageView;
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -37,11 +39,12 @@ public class SettingActivity extends BaseActivity {
         // Set up UI elements
         Button btnLinkGoogleAccount = findViewById(R.id.btnLinkGoogleAccount);
         TextView txtAccountInfo = findViewById(R.id.txtAccountInfo);
+        ImageView imgProfilePicture = findViewById(R.id.imgProfilePicture);
 
         // Check if already signed in
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
         if (account != null) {
-            displayAccountInfo(account, txtAccountInfo);
+            displayAccountInfo(account, txtAccountInfo, imgProfilePicture);
         }
 
         // Handle button click for Google Sign-In
@@ -58,10 +61,11 @@ public class SettingActivity extends BaseActivity {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             task.addOnCompleteListener(this, completedTask -> {
                 TextView txtAccountInfo = findViewById(R.id.txtAccountInfo);
+                ImageView imgProfilePicture = findViewById(R.id.imgProfilePicture);
                 if (completedTask.isSuccessful()) {
                     GoogleSignInAccount account = completedTask.getResult();
                     if (account != null) {
-                        displayAccountInfo(account, txtAccountInfo);
+                        displayAccountInfo(account, txtAccountInfo, imgProfilePicture);
                     } else {
                         txtAccountInfo.setText("Account retrieval failed: Account is null.");
                     }
@@ -72,12 +76,20 @@ public class SettingActivity extends BaseActivity {
         }
     }
 
-    private void displayAccountInfo(GoogleSignInAccount account, TextView txtAccountInfo) {
+    private void displayAccountInfo(GoogleSignInAccount account, TextView txtAccountInfo, ImageView imgProfilePicture) {
         if (account != null) {
             String accountInfo = "Name: " + account.getDisplayName() + "\nEmail: " + account.getEmail();
             txtAccountInfo.setText(accountInfo);
+
+            // Load profile image
+            if (account.getPhotoUrl() != null) {
+                Glide.with(this).load(account.getPhotoUrl()).into(imgProfilePicture);
+            } else {
+                imgProfilePicture.setImageResource(R.drawable.default_profile_picture); // Fallback image
+            }
         } else {
             txtAccountInfo.setText("No account info available.");
+            imgProfilePicture.setImageResource(R.drawable.default_profile_picture); // Fallback image
         }
     }
 }
