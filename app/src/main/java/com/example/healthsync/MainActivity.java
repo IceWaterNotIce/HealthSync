@@ -96,8 +96,13 @@ public class MainActivity extends BaseActivity {
             return "尚無飲食記錄。建議每餐攝取 500-700 kcal，並保持 4 小時的間隔。";
         }
 
+        // 修正記錄中可能存在的多餘空格
         String[] recordArray = records.split("\n");
-        String lastRecord = recordArray[recordArray.length - 1].trim();
+        for (int i = 0; i < recordArray.length; i++) {
+            recordArray[i] = recordArray[i].trim().replaceAll("\\s{2,}", " "); // 移除多餘空格
+        }
+
+        String lastRecord = recordArray[recordArray.length - 1];
 
         if (lastRecord.isEmpty() || !lastRecord.contains(" - ")) {
             return "記錄格式錯誤或記錄為空，無法建議";
