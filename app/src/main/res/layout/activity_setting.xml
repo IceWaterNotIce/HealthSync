@@ -5,6 +5,7 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
+    <!-- Title -->
     <TextView
         android:id="@+id/settingTitle"
         android:layout_width="wrap_content"
@@ -15,20 +16,23 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="16dp" />
 
+    <!-- Profile Picture -->
     <ImageView
         android:id="@+id/imgProfilePicture"
         android:layout_width="100dp"
         android:layout_height="100dp"
+        android:layout_below="@id/settingTitle"
         android:layout_marginTop="16dp"
-        android:layout_gravity="center"
+        android:layout_centerHorizontal="true"
         android:scaleType="centerCrop"
         android:src="@drawable/default_profile_picture" />
 
+    <!-- Account Section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_below="@id/settingTitle"
+        android:layout_below="@id/imgProfilePicture"
         android:layout_marginTop="32dp">
 
         <Button
@@ -46,5 +50,5 @@
             android:textSize="16sp" />
     </LinearLayout>
 
-    <!-- 其他設定項目可以在此新增 -->
+    <!-- Additional settings can be added here -->
 </RelativeLayout>
