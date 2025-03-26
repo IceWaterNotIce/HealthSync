@@ -95,6 +95,15 @@ public class MainActivity extends BaseActivity {
         TextView suggestionTextView = findViewById(R.id.suggestionTextView);
         String suggestion = suggestNextMeal();
         suggestionTextView.setText(suggestion);
+
+        // 確保在應用啟動時正確顯示建議
+        suggestionTextView.post(new Runnable() {
+            @Override
+            public void run() {
+                String suggestion = suggestNextMeal();
+                suggestionTextView.setText(suggestion);
+            }
+        });
     }
 
     @Override
@@ -135,14 +144,14 @@ public class MainActivity extends BaseActivity {
         SharedPreferences sharedPreferences = getSharedPreferences("FoodRecords", MODE_PRIVATE);
         String records = sharedPreferences.getString("records", "");
 
-        if (records.trim().isEmpty()) { // 修正條件，確保空記錄不會進一步處理
+        if (records.trim().isEmpty()) {
             return "尚無飲食記錄。建議每餐攝取 500-700 kcal，並保持 4 小時的間隔。";
         }
 
         String[] recordArray = records.split("\n");
         String lastRecord = recordArray[recordArray.length - 1].trim();
 
-        if (lastRecord.isEmpty() || !lastRecord.contains(" - ")) { // 檢查記錄是否有效
+        if (lastRecord.isEmpty() || !lastRecord.contains(" - ")) {
             return "記錄格式錯誤或記錄為空，無法建議";
         }
 
@@ -152,7 +161,11 @@ public class MainActivity extends BaseActivity {
         }
 
         String lastTime = lastRecordParts[0].trim();
-        String lastCalories = lastRecordParts[2].replace(" kcal", "").trim();
+        String lastCalories = lastRecordParts[2].replaceAll("[^0-9]", ""); // 僅提取數字部分
+
+        if (lastTime.isEmpty() || lastCalories.isEmpty()) {
+            return "記錄格式錯誤，無法建議";
+        }
 
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
