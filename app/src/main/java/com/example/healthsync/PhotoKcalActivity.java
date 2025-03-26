@@ -90,6 +90,14 @@ public class PhotoKcalActivity extends AppCompatActivity {
         });
 
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+
+        Button btnReturn = findViewById(R.id.btnReturn);
+        btnReturn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); // 返回上一個活動
+            }
+        });
     }
 
     private void callSiliconFlowChatAPI(Uri imageUri) {

@@ -16,6 +16,33 @@
 
             <!-- Add your UI components here -->
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <Button
+                    android:id="@+id/btnAddFood"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="新增飲食記錄"
+                    android:layout_marginBottom="16dp" />
+
+                <Button
+                    android:id="@+id/btnViewHistory"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="查看飲食歷史" />
+
+                <Button
+                    android:id="@+id/btnPhotoKcal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="拍照計算卡路里"
+                    android:layout_marginTop="16dp" />
+            </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 

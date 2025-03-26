@@ -91,6 +91,14 @@ public class FoodHistoryActivity extends AppCompatActivity {
         });
 
         lineChart.invalidate(); // 刷新圖表
+
+        Button btnReturn = findViewById(R.id.btnReturn);
+        btnReturn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); // 返回上一個活動
+            }
+        });
     }
 
     private void loadFoodHistory(TextView historyTextView) {

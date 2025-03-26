@@ -45,6 +45,14 @@ public class AddFoodActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        Button btnReturn = findViewById(R.id.btnReturn);
+        btnReturn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish(); // 返回上一個活動
+            }
+        });
     }
 
     private void saveFoodRecord(String foodName, String calories) {

@@ -24,4 +24,11 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="API 回應將顯示在這裡" />
+
+    <Button
+        android:id="@+id/btnReturn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="返回"
+        android:layout_marginTop="16dp" />
 </LinearLayout>
