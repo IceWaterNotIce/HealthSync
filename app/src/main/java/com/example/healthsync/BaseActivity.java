@@ -15,13 +15,11 @@ public abstract class BaseActivity extends AppCompatActivity {
 
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         if (bottomNavigationView != null) {
-            // Set the selected item based on the current activity
             int currentMenuItemId = getCurrentMenuItemId();
             if (currentMenuItemId != 0) {
-                bottomNavigationView.setSelectedItemId(currentMenuItemId);
+                bottomNavigationView.setSelectedItemId(currentMenuItemId); // 確保高亮當前活動
             }
 
-            // Handle navigation item selection
             bottomNavigationView.setOnItemSelectedListener(item -> {
                 int itemId = item.getItemId();
                 if (itemId == R.id.nav_food && !(this instanceof FoodActivity)) {
@@ -32,6 +30,12 @@ public abstract class BaseActivity extends AppCompatActivity {
                     return true;
                 } else if (itemId == R.id.nav_bmi && !(this instanceof BMIActivity)) {
                     startActivity(new Intent(this, BMIActivity.class));
+                    return true;
+                } else if (itemId == R.id.nav_sport && !(this instanceof SportActivity)) {
+                    startActivity(new Intent(this, SportActivity.class));
+                    return true;
+                } else if (itemId == R.id.nav_setting && !(this instanceof SettingActivity)) {
+                    startActivity(new Intent(this, SettingActivity.class));
                     return true;
                 }
                 return false;

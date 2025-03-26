@@ -46,6 +46,22 @@
                 android:text="Steps: 0"
                 android:textSize="24sp"
                 android:textStyle="bold" />
+
+            <Button
+                android:id="@+id/btnGoToSport"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Go to Sport Activity"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal" />
+
+            <Button
+                android:id="@+id/btnGoToSetting"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Go to Setting Activity"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal" />
         </LinearLayout>
     </ScrollView>
 

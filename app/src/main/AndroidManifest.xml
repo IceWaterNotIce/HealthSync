@@ -32,6 +32,8 @@
         <activity android:name=".FoodActivity" />
         <activity android:name=".BMIActivity" />
         <activity android:name=".StepCounterActivity" />
+        <activity android:name=".SportActivity" />
+        <activity android:name=".SettingActivity" />
     </application>
 
 </manifest>

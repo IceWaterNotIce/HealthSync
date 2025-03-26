@@ -4,11 +4,19 @@
         android:icon="@drawable/ic_food"
         android:title="Food" />
     <item
+        android:id="@+id/nav_bmi"
+        android:icon="@drawable/ic_bmi"
+        android:title="BMI" />
+    <item
         android:id="@+id/nav_home"
         android:icon="@drawable/ic_home"
         android:title="Home" />
     <item
-        android:id="@+id/nav_bmi"
-        android:icon="@drawable/ic_bmi"
-        android:title="BMI" />
+        android:id="@+id/nav_sport"
+        android:icon="@drawable/ic_sport"
+        android:title="Sport" />
+    <item
+        android:id="@+id/nav_setting"
+        android:icon="@drawable/ic_setting"
+        android:title="Settings" />
 </menu>

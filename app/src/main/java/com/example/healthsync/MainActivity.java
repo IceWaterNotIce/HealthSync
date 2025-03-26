@@ -1,14 +1,9 @@
 package com.example.healthsync;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.View; // 修正導入 View 的問題
 import android.widget.Button;
@@ -20,11 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class MainActivity extends BaseActivity implements SensorEventListener {
-
-    private SensorManager sensorManager;
-    private Sensor stepCounterSensor;
-    private TextView stepCountTextView;
+public class MainActivity extends BaseActivity {
 
     @Override
     protected int getLayoutResourceId() {
@@ -61,16 +52,6 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
                 suggestionTextView.setText(suggestion);
             }
         });
-
-        stepCountTextView = findViewById(R.id.stepCountTextView);
-
-        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        if (sensorManager != null) {
-            stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-            if (stepCounterSensor == null) {
-                Toast.makeText(this, "Step Counter Sensor not available!", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     @Override
@@ -80,18 +61,6 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
         TextView suggestionTextView = findViewById(R.id.suggestionTextView);
         String suggestion = suggestNextMeal();
         suggestionTextView.setText(suggestion);
-
-        if (stepCounterSensor != null) {
-            sensorManager.registerListener(this, stepCounterSensor, SensorManager.SENSOR_DELAY_UI);
-        }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        if (sensorManager != null) {
-            sensorManager.unregisterListener(this);
-        }
     }
 
     // 計算目標 BMI
@@ -165,18 +134,5 @@ public class MainActivity extends BaseActivity implements SensorEventListener {
         } catch (Exception e) {
             return "無法解析記錄時間，請檢查記錄格式。";
         }
-    }
-
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            int steps = (int) event.values[0];
-            stepCountTextView.setText("Steps: " + steps);
-        }
-    }
-
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        // Not used
     }
 }
