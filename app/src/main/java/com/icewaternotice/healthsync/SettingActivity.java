@@ -7,12 +7,14 @@ import android.widget.TextView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+import android.app.DatePickerDialog;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.Task;
+import java.util.Calendar;
 
 public class SettingActivity extends BaseActivity {
 
@@ -81,6 +83,16 @@ public class SettingActivity extends BaseActivity {
 
         btnMale.setOnClickListener(v -> saveGender("男"));
         btnFemale.setOnClickListener(v -> saveGender("女"));
+
+        // Add birthday selection
+        TextView txtBirthdayInfo = findViewById(R.id.txtBirthdayInfo);
+        Button btnSelectBirthday = findViewById(R.id.btnSelectBirthday);
+
+        // Load saved birthday
+        String savedBirthday = sharedPreferences.getString("birthday", "未設定");
+        txtBirthdayInfo.setText("生日: " + savedBirthday);
+
+        btnSelectBirthday.setOnClickListener(v -> showDatePickerDialog(txtBirthdayInfo));
     }
 
     @Override
@@ -133,5 +145,28 @@ public class SettingActivity extends BaseActivity {
 
         TextView txtGenderInfo = findViewById(R.id.txtGenderInfo);
         txtGenderInfo.setText("目前性別: " + gender);
+    }
+
+    private void showDatePickerDialog(TextView txtBirthdayInfo) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDay) -> {
+            String birthday = selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay;
+            saveBirthday(birthday);
+            txtBirthdayInfo.setText("生日: " + birthday);
+        }, year, month, day);
+
+        datePickerDialog.show();
+    }
+
+    private void saveBirthday(String birthday) {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("birthday", birthday);
+        editor.apply();
+        Toast.makeText(this, "生日已保存: " + birthday, Toast.LENGTH_SHORT).show();
     }
 }

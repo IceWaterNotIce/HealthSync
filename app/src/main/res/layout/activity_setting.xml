@@ -76,9 +76,29 @@
                 android:layout_height="wrap_content"
                 android:text="女" />
         </LinearLayout>
-    </LinearLayout>
 
-    <!-- Gender Selection Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="32dp">
+
+            <!-- Birthday Section -->
+            <TextView
+                android:id="@+id/txtBirthdayInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="生日: 未設定"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnSelectBirthday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="選擇生日" />
+        </LinearLayout>
+    </LinearLayout>
 
     <!-- Additional settings can be added here -->
 </RelativeLayout>
