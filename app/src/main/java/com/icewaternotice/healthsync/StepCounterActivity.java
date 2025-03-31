@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 
 public class StepCounterActivity extends BaseActivity implements SensorEventListener {
 
@@ -25,6 +28,7 @@ public class StepCounterActivity extends BaseActivity implements SensorEventList
     private SensorManager sensorManager;
     private Sensor stepCounterSensor;
     private TextView stepCountTextView;
+    private int initialStepCount = -1; // 用於儲存初始步數
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,26 @@ public class StepCounterActivity extends BaseActivity implements SensorEventList
             stepCounterSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
             if (stepCounterSensor == null) {
                 Toast.makeText(this, "Step Counter Sensor not available!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        }
+
+        // 檢查並請求 ACTIVITY_RECOGNITION 權限
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (checkSelfPermission(Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, 1);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 1) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "Permission granted!", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "Permission denied. Step counter may not work.", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
@@ -62,8 +86,12 @@ public class StepCounterActivity extends BaseActivity implements SensorEventList
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            int steps = (int) event.values[0];
-            stepCountTextView.setText("Steps: " + steps);
+            int totalSteps = (int) event.values[0];
+            if (initialStepCount == -1) {
+                initialStepCount = totalSteps; // 儲存初始步數
+            }
+            int stepsSinceStart = totalSteps - initialStepCount;
+            stepCountTextView.setText("Steps: " + stepsSinceStart); // 顯示步數
         }
     }
 
