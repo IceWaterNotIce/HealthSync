@@ -32,6 +32,8 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        syncUserData(); // Sync user data when the app opens
+        
         // 顯示目標 BMI
         TextView targetBMITextView = findViewById(R.id.targetBMITextView);
         String targetBMI = calculateTargetBMI();
@@ -58,6 +60,27 @@ public class MainActivity extends BaseActivity {
                 suggestionTextView.setText(suggestion);
             }
         });
+
+
+    }
+
+    private void syncUserData() {
+        UserDataSyncManager userDataSyncManager = new UserDataSyncManager(this);
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+
+        // Sync gender
+        String gender = sharedPreferences.getString("gender", "未設定");
+        userDataSyncManager.syncData("gender", gender, "性別");
+
+        // Sync birthday
+        String birthday = sharedPreferences.getString("birthday", "未設定");
+        userDataSyncManager.syncData("birthday", birthday, "生日");
+
+        // Sync height and weight
+        String height = sharedPreferences.getString("height", "未設定");
+        String weight = sharedPreferences.getString("weight", "未設定");
+        userDataSyncManager.syncData("height", height, "Height");
+        userDataSyncManager.syncData("weight", weight, "Weight");
     }
 
     @Override
