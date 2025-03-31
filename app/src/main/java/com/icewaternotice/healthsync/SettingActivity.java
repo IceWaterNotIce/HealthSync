@@ -26,6 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import java.util.Calendar;
 
 public class SettingActivity extends BaseActivity {
@@ -69,8 +70,29 @@ public class SettingActivity extends BaseActivity {
         progressBar = findViewById(R.id.progressBar); // 假設在佈局中添加了一個進度條
         progressBar.setVisibility(View.GONE); // 默認隱藏
 
-        // Check if already signed in
+        // Add display name editing functionality
+        TextView txtDisplayName = findViewById(R.id.txtDisplayName);
+        Button btnEditDisplayName = findViewById(R.id.btnEditDisplayName);
+
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            txtDisplayName.setText(currentUser.getDisplayName());
+        }
+
+        btnEditDisplayName.setOnClickListener(v -> {
+            if (currentUser != null) {
+                String newDisplayName = txtDisplayName.getText().toString().trim();
+                if (!newDisplayName.isEmpty()) {
+                    updateDisplayName(newDisplayName);
+                } else {
+                    Toast.makeText(this, "顯示名稱不能為空", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "用戶未登錄，無法更新顯示名稱", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Check if already signed in
         if (currentUser != null) {
             displayFirebaseUserInfo(currentUser, txtAccountInfo, imgProfilePicture);
             btnLinkGoogleAccount.setText("Unlink Google Account");
@@ -279,5 +301,23 @@ public class SettingActivity extends BaseActivity {
         }, year, month, day);
 
         datePickerDialog.show();
+    }
+
+    private void updateDisplayName(String newDisplayName) {
+        updateUIBeforeSave();
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            currentUser.updateProfile(new UserProfileChangeRequest.Builder()
+                    .setDisplayName(newDisplayName)
+                    .build())
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "顯示名稱已更新", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "顯示名稱更新失敗: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                    updateUIAfterSave();
+                });
+        }
     }
 }

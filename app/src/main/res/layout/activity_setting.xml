@@ -106,6 +106,23 @@
                 android:layout_height="wrap_content"
                 android:text="選擇生日" />
         </LinearLayout>
+
+        <!-- Display Name Section -->
+        <EditText
+            android:id="@+id/txtDisplayName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="顯示名稱"
+            android:padding="8dp"
+            android:background="@drawable/edit_text_background"
+            android:inputType="textPersonName" />
+
+        <Button
+            android:id="@+id/btnEditDisplayName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="更新顯示名稱"
+            android:layout_marginTop="8dp" />
     </LinearLayout>
 
     <!-- Additional settings can be added here -->
