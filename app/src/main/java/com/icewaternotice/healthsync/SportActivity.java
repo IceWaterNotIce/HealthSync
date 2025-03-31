@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.content.SharedPreferences;
+import android.widget.Toast;
 
 public class SportActivity extends BaseActivity {
 
@@ -35,6 +37,12 @@ public class SportActivity extends BaseActivity {
         TextView tvSportTarget = findViewById(R.id.tvSportTarget);
         SeekBar seekBarSportTarget = findViewById(R.id.seekBarSportTarget);
 
+        // 載入儲存的運動目標卡路里
+        SharedPreferences sharedPreferences = getSharedPreferences("SportPrefs", MODE_PRIVATE);
+        int savedTargetKcal = sharedPreferences.getInt("targetKcal", 0);
+        tvSportTarget.setText("運動目標卡路里: " + savedTargetKcal + " kcal");
+        seekBarSportTarget.setProgress(savedTargetKcal);
+
         seekBarSportTarget.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -48,8 +56,16 @@ public class SportActivity extends BaseActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                // Do nothing
+                saveTargetKcal(seekBar.getProgress());
             }
         });
+    }
+
+    private void saveTargetKcal(int targetKcal) {
+        SharedPreferences sharedPreferences = getSharedPreferences("SportPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("targetKcal", targetKcal);
+        editor.apply();
+        Toast.makeText(this, "運動目標卡路里已保存: " + targetKcal + " kcal", Toast.LENGTH_SHORT).show();
     }
 }
