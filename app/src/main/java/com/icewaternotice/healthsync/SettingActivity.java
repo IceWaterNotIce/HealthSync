@@ -52,7 +52,7 @@ public class SettingActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_setting); // 確保設置正確的佈局
+       
         userDataSyncManager = new UserDataSyncManager(this);
 
         // Configure Google Sign-In
