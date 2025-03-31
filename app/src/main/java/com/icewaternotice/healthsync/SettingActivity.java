@@ -1,10 +1,12 @@
 package com.icewaternotice.healthsync;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -66,6 +68,19 @@ public class SettingActivity extends BaseActivity {
                 startActivityForResult(signInIntent, RC_SIGN_IN);
             }
         });
+
+        // Add gender selection buttons
+        Button btnMale = findViewById(R.id.btnMale);
+        Button btnFemale = findViewById(R.id.btnFemale);
+
+        // Load saved gender
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String savedGender = sharedPreferences.getString("gender", "未設定");
+        TextView txtGenderInfo = findViewById(R.id.txtGenderInfo);
+        txtGenderInfo.setText("目前性別: " + savedGender);
+
+        btnMale.setOnClickListener(v -> saveGender("男"));
+        btnFemale.setOnClickListener(v -> saveGender("女"));
     }
 
     @Override
@@ -107,5 +122,16 @@ public class SettingActivity extends BaseActivity {
             txtAccountInfo.setText("No account info available.");
             imgProfilePicture.setImageResource(R.drawable.default_profile_picture); // Fallback image
         }
+    }
+
+    private void saveGender(String gender) {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("gender", gender);
+        editor.apply();
+        Toast.makeText(this, "性別已保存: " + gender, Toast.LENGTH_SHORT).show();
+
+        TextView txtGenderInfo = findViewById(R.id.txtGenderInfo);
+        txtGenderInfo.setText("目前性別: " + gender);
     }
 }
