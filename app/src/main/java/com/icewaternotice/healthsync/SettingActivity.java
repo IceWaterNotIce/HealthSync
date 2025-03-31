@@ -28,6 +28,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import java.util.Calendar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class SettingActivity extends BaseActivity {
 
@@ -195,6 +196,30 @@ public class SettingActivity extends BaseActivity {
                 public void onCancelled(DatabaseError error) {
                     Toast.makeText(SettingActivity.this, "生日更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
                 }
+            });
+        }
+
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        if (bottomNavigationView != null) {
+            // Highlight the current menu item
+            bottomNavigationView.setSelectedItemId(R.id.nav_setting);
+
+            bottomNavigationView.setOnItemSelectedListener(item -> {
+                int itemId = item.getItemId();
+                if (itemId == R.id.nav_home) {
+                    startActivity(new Intent(SettingActivity.this, MainActivity.class));
+                    return true;
+                } else if (itemId == R.id.nav_bmi) {
+                    startActivity(new Intent(SettingActivity.this, BMIActivity.class));
+                    return true;
+                } else if (itemId == R.id.nav_food) {
+                    startActivity(new Intent(SettingActivity.this, FoodActivity.class));
+                    return true;
+                } else if (itemId == R.id.nav_sport) {
+                    startActivity(new Intent(SettingActivity.this, SportActivity.class));
+                    return true;
+                }
+                return false;
             });
         }
     }
