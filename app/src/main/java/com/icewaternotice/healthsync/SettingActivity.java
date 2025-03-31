@@ -8,6 +8,8 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 import android.app.DatePickerDialog;
+import android.view.View;
+import android.widget.ProgressBar;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -19,13 +21,20 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import java.util.Calendar;
 
 public class SettingActivity extends BaseActivity {
 
     private GoogleSignInClient googleSignInClient;
     private FirebaseAuth firebaseAuth;
+    private DatabaseReference databaseReference;
     private static final int RC_SIGN_IN = 100;
+    private ProgressBar progressBar;
 
     @Override
     protected int getLayoutResourceId() {
@@ -50,10 +59,15 @@ public class SettingActivity extends BaseActivity {
         // Initialize Firebase Auth
         firebaseAuth = FirebaseAuth.getInstance();
 
+        // Initialize Firebase Database reference
+        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+
         // Set up UI elements
         Button btnLinkGoogleAccount = findViewById(R.id.btnLinkGoogleAccount);
         TextView txtAccountInfo = findViewById(R.id.txtAccountInfo);
         ImageView imgProfilePicture = findViewById(R.id.imgProfilePicture);
+        progressBar = findViewById(R.id.progressBar); // 假設在佈局中添加了一個進度條
+        progressBar.setVisibility(View.GONE); // 默認隱藏
 
         // Check if already signed in
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
@@ -103,6 +117,39 @@ public class SettingActivity extends BaseActivity {
         txtBirthdayInfo.setText("生日: " + savedBirthday);
 
         btnSelectBirthday.setOnClickListener(v -> showDatePickerDialog(txtBirthdayInfo));
+
+        // Listen for changes in gender and birthday
+        if (currentUser != null) {
+            databaseReference.child(currentUser.getUid()).child("gender").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    String updatedGender = snapshot.getValue(String.class);
+                    if (updatedGender != null) {
+                        txtGenderInfo.setText("目前性別: " + updatedGender);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(SettingActivity.this, "性別更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            databaseReference.child(currentUser.getUid()).child("birthday").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    String updatedBirthday = snapshot.getValue(String.class);
+                    if (updatedBirthday != null) {
+                        txtBirthdayInfo.setText("生日: " + updatedBirthday);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(SettingActivity.this, "生日更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
 
     @Override
@@ -116,12 +163,13 @@ public class SettingActivity extends BaseActivity {
                     firebaseAuthWithGoogle(account);
                 }
             } else {
-                Toast.makeText(this, "Google Sign-In failed.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Google Sign-In 失敗: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
     private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        updateUIBeforeSave();
         AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
         firebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, task -> {
             if (task.isSuccessful()) {
@@ -134,8 +182,9 @@ public class SettingActivity extends BaseActivity {
                     btnLinkGoogleAccount.setText("Unlink Google Account");
                 }
             } else {
-                Toast.makeText(this, "Firebase Authentication failed.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Firebase 認證失敗: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
+            updateUIAfterSave();
         });
     }
 
@@ -169,14 +218,52 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void saveGender(String gender) {
+        updateUIBeforeSave();
         SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("gender", gender);
         editor.apply();
-        Toast.makeText(this, "性別已保存: " + gender, Toast.LENGTH_SHORT).show();
 
         TextView txtGenderInfo = findViewById(R.id.txtGenderInfo);
         txtGenderInfo.setText("目前性別: " + gender);
+
+        syncWithFirebase("gender", gender, "性別");
+    }
+
+    private void saveBirthday(String birthday) {
+        updateUIBeforeSave();
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("birthday", birthday);
+        editor.apply();
+
+        syncWithFirebase("birthday", birthday, "生日");
+    }
+
+    private void syncWithFirebase(String key, String value, String displayName) {
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            databaseReference.child(currentUser.getUid()).child(key).setValue(value)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, displayName + "已同步至 Firebase", Toast.LENGTH_SHORT).show();
+                    updateUIAfterSave();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, displayName + "同步失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    updateUIAfterSave();
+                });
+        } else {
+            Toast.makeText(this, "用戶未登錄，無法同步 " + displayName, Toast.LENGTH_SHORT).show();
+            updateUIAfterSave();
+        }
+    }
+
+    private void updateUIBeforeSave() {
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void updateUIAfterSave() {
+        progressBar.setVisibility(View.GONE);
     }
 
     private void showDatePickerDialog(TextView txtBirthdayInfo) {
@@ -192,13 +279,5 @@ public class SettingActivity extends BaseActivity {
         }, year, month, day);
 
         datePickerDialog.show();
-    }
-
-    private void saveBirthday(String birthday) {
-        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("birthday", birthday);
-        editor.apply();
-        Toast.makeText(this, "生日已保存: " + birthday, Toast.LENGTH_SHORT).show();
     }
 }
