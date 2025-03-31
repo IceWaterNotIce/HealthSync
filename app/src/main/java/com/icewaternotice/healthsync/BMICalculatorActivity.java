@@ -26,6 +26,7 @@ public class BMICalculatorActivity extends BaseActivity {
 
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
+    private UserDataSyncManager userDataSyncManager;
 
     @Override
     protected int getLayoutResourceId() {
@@ -44,6 +45,7 @@ public class BMICalculatorActivity extends BaseActivity {
         // Initialize Firebase Auth and Database Reference
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        userDataSyncManager = new UserDataSyncManager(this);
 
         EditText etHeight = findViewById(R.id.etHeight);
         EditText etWeight = findViewById(R.id.etWeight);
@@ -191,8 +193,8 @@ public class BMICalculatorActivity extends BaseActivity {
         Toast.makeText(this, "Height and weight saved.", Toast.LENGTH_SHORT).show();
 
         // Sync height and weight to Firebase
-        syncWithFirebase("height", height, "Height");
-        syncWithFirebase("weight", weight, "Weight");
+        userDataSyncManager.syncData("height", height, "Height");
+        userDataSyncManager.syncData("weight", weight, "Weight");
     }
 
     private void saveBMIToHistory(float bmi) {
@@ -211,27 +213,12 @@ public class BMICalculatorActivity extends BaseActivity {
         editor.apply();
 
         // Sync BMI and BMI history to Firebase
-        syncWithFirebase("bmi", String.format("%.2f", bmi), "BMI");
-        syncWithFirebase("bmiHistory", updatedHistory, "BMI History");
+        userDataSyncManager.syncData("bmi", String.format("%.2f", bmi), "BMI");
+        userDataSyncManager.syncData("bmiHistory", updatedHistory, "BMI History");
 
         // Log the updated history for debugging
         Log.d("BMICalculatorActivity", "Updated BMI History: " + updatedHistory);
 
         Toast.makeText(this, "BMI saved to history.", Toast.LENGTH_SHORT).show();
-    }
-
-    private void syncWithFirebase(String key, String value, String displayName) {
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        if (currentUser != null) {
-            databaseReference.child(currentUser.getUid()).child(key).setValue(value)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, displayName + " synced to Firebase.", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, displayName + " sync failed: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-        } else {
-            Toast.makeText(this, "User not logged in. Cannot sync " + displayName, Toast.LENGTH_SHORT).show();
-        }
     }
 }

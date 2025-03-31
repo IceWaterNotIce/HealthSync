@@ -36,6 +36,7 @@ public class SettingActivity extends BaseActivity {
     private DatabaseReference databaseReference;
     private static final int RC_SIGN_IN = 100;
     private ProgressBar progressBar;
+    private UserDataSyncManager userDataSyncManager;
 
     @Override
     protected int getLayoutResourceId() {
@@ -50,6 +51,8 @@ public class SettingActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        userDataSyncManager = new UserDataSyncManager(this);
+
         // Configure Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken(getString(R.string.default_web_client_id)) // Use your Firebase Web Client ID
@@ -267,7 +270,7 @@ public class SettingActivity extends BaseActivity {
         TextView txtGenderInfo = findViewById(R.id.txtGenderInfo);
         txtGenderInfo.setText("目前性別: " + gender);
 
-        syncWithFirebase("gender", gender, "性別");
+        userDataSyncManager.syncData("gender", gender, "性別");
     }
 
     private void saveBirthday(String birthday) {
@@ -277,7 +280,7 @@ public class SettingActivity extends BaseActivity {
         editor.putString("birthday", birthday);
         editor.apply();
 
-        syncWithFirebase("birthday", birthday, "生日");
+        userDataSyncManager.syncData("birthday", birthday, "生日");
     }
 
     private void syncWithFirebase(String key, String value, String displayName) {
