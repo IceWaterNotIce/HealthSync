@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -250,14 +251,21 @@ public class MainActivity extends BaseActivity {
             long days = differenceInMillis / (1000L * 60 * 60 * 24);
             return String.valueOf(days);
         } catch (Exception e) {
-            e.printStackTrace();
-            return "0";
+            // Log the error for debugging purposes
+            Log.e("MainActivity", "Error parsing firstLaunchDate: " + firstLaunchDateStr, e);
+            return "0"; // Return "0" as a fallback
         }
     }
 
     private void calculateAndDisplayCaloriesToEat() {
         SharedPreferences sharedPreferences = getSharedPreferences("SportPrefs", MODE_PRIVATE);
         int targetSportKcal = sharedPreferences.getInt("targetKcal", 0);
+
+        // Validate targetSportKcal to ensure it is non-negative
+        if (targetSportKcal < 0) {
+            Toast.makeText(this, "Invalid target sport calories. Please check your settings.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         String bmrStr = calculateBMR(); // Assuming calculateBMR() returns a String
         if (bmrStr.equals(getString(R.string.cannot_calculate_missing_data)) || 
@@ -266,10 +274,16 @@ public class MainActivity extends BaseActivity {
             return;
         }
 
-        double bmr = Double.parseDouble(bmrStr);
-        double caloriesToEat = bmr + targetSportKcal;
+        try {
+            double bmr = Double.parseDouble(bmrStr);
+            double caloriesToEat = bmr + targetSportKcal;
 
-        TextView caloriesToEatTextView = findViewById(R.id.caloriesToEatTextView);
-        caloriesToEatTextView.setText(String.format(Locale.getDefault(), "您今天需要攝取的卡路里: %.2f kcal", caloriesToEat));
+            TextView caloriesToEatTextView = findViewById(R.id.caloriesToEatTextView);
+            caloriesToEatTextView.setText(String.format(Locale.getDefault(), "您今天需要攝取的卡路里: %.2f kcal", caloriesToEat));
+        } catch (NumberFormatException e) {
+            // Log the error and show a user-friendly message
+            Log.e("MainActivity", "Error parsing BMR value: " + bmrStr, e);
+            Toast.makeText(this, "Error calculating calories. Please check your data.", Toast.LENGTH_SHORT).show();
+        }
     }
 }
