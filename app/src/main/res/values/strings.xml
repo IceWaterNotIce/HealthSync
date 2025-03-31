@@ -19,4 +19,5 @@
     <string name="invalid_record_format">記錄格式錯誤，無法建議</string>
     <string name="next_meal_suggestion">距離上次進食已過 %1$d 小時。建議下一餐攝取 %2$d kcal，並在 %3$d 小時內進食。</string>
     <string name="cannot_parse_record_time">無法解析記錄時間，請檢查記錄格式。</string>
+    <string name="usage_days_message">您已使用此應用 %1$s 天。</string>
 </resources>

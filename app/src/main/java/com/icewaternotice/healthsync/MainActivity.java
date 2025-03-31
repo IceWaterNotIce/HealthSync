@@ -63,6 +63,18 @@ public class MainActivity extends BaseActivity {
 
         // 確保在應用啟動時正確顯示建議
         suggestionTextView.post(() -> suggestionTextView.setText(suggestNextMeal()));
+
+        // 保存首次啟動日期
+        SharedPreferences sharedPreferences = getSharedPreferences("AppUsagePrefs", MODE_PRIVATE);
+        if (!sharedPreferences.contains("firstLaunchDate")) {
+            String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
+            sharedPreferences.edit().putString("firstLaunchDate", currentDate).apply();
+        }
+
+        // 計算並顯示使用天數
+        TextView usageDaysTextView = findViewById(R.id.usageDaysTextView);
+        String usageDays = calculateUsageDays();
+        usageDaysTextView.setText(getString(R.string.usage_days_message, usageDays));
     }
 
     private void showProgressDialog() {
@@ -217,6 +229,26 @@ public class MainActivity extends BaseActivity {
             return getString(R.string.next_meal_suggestion, timeSinceLastMeal, suggestedCalories, Math.max(0, 4 - timeSinceLastMeal));
         } catch (Exception e) {
             return getString(R.string.cannot_parse_record_time);
+        }
+    }
+
+    private String calculateUsageDays() {
+        SharedPreferences sharedPreferences = getSharedPreferences("AppUsagePrefs", MODE_PRIVATE);
+        String firstLaunchDateStr = sharedPreferences.getString("firstLaunchDate", "");
+        if (firstLaunchDateStr.isEmpty()) {
+            return "0";
+        }
+
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date firstLaunchDate = sdf.parse(firstLaunchDateStr);
+            Date today = new Date();
+            long differenceInMillis = today.getTime() - firstLaunchDate.getTime();
+            long days = differenceInMillis / (1000L * 60 * 60 * 24);
+            return String.valueOf(days);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "0";
         }
     }
 }

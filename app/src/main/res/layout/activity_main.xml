@@ -104,6 +104,16 @@
                         android:textColor="@color/black" />
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/usageDaysTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/black"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center_horizontal"
+                android:text="You have been using this app for 0 days." />
         </LinearLayout>
     </ScrollView>
 
