@@ -36,6 +36,18 @@ public class BMICalculatorActivity extends BaseActivity {
         Button btnCalculateBMI = findViewById(R.id.btnCalculateBMI);
         Button returnButton = findViewById(R.id.btnReturnToBMI);
 
+        // Load saved height and weight
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String savedHeight = sharedPreferences.getString("height", "");
+        String savedWeight = sharedPreferences.getString("weight", "");
+
+        if (!savedHeight.isEmpty()) {
+            etHeight.setText(savedHeight);
+        }
+        if (!savedWeight.isEmpty()) {
+            etWeight.setText(savedWeight);
+        }
+
         // Handle BMI calculation
         btnCalculateBMI.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,6 +64,8 @@ public class BMICalculatorActivity extends BaseActivity {
                     float height = Float.parseFloat(heightStr) / 100; // Convert cm to meters
                     float weight = Float.parseFloat(weightStr);
                     float bmi = weight / (height * height);
+
+                    saveHeightAndWeight(heightStr, weightStr);
 
                     String bmiCategory;
                     if (bmi < 18.5) {
@@ -85,6 +99,15 @@ public class BMICalculatorActivity extends BaseActivity {
                 finish(); // Close the current activity
             }
         });
+    }
+
+    private void saveHeightAndWeight(String height, String weight) {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("height", height);
+        editor.putString("weight", weight);
+        editor.apply();
+        Toast.makeText(this, "Height and weight saved.", Toast.LENGTH_SHORT).show();
     }
 
     private void saveBMIToHistory(float bmi) {
