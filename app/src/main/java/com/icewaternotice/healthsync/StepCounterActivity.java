@@ -15,12 +15,12 @@ public class StepCounterActivity extends BaseActivity implements SensorEventList
 
         @Override
         protected int getLayoutResourceId() {
-            return R.layout.activity_setting;
+            return R.layout.activity_step_counter; // 修正為正確的佈局資源 ID
         }
     
         @Override
         protected int getCurrentMenuItemId() {
-            return R.id.nav_setting;
+            return R.id.nav_sport; // 修正為正確的菜單項目 ID
         }
     private SensorManager sensorManager;
     private Sensor stepCounterSensor;
@@ -29,7 +29,7 @@ public class StepCounterActivity extends BaseActivity implements SensorEventList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_step_counter);
+    
 
         stepCountTextView = findViewById(R.id.stepCountTextView);
 
