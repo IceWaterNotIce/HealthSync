@@ -22,15 +22,23 @@ public class UserDataSyncManager {
     public void syncData(String key, String value, String displayName) {
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {
-            databaseReference.child(currentUser.getUid()).child(key).setValue(value)
-                .addOnSuccessListener(aVoid -> 
-                    Toast.makeText(context, displayName + " 已同步至 Firebase", Toast.LENGTH_SHORT).show()
-                )
-                .addOnFailureListener(e -> 
-                    Toast.makeText(context, displayName + " 同步失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                );
+            performDataSync(currentUser.getUid(), key, value, displayName);
         } else {
-            Toast.makeText(context, "用戶未登錄，無法同步 " + displayName, Toast.LENGTH_SHORT).show();
+            notifyUser("用戶未登錄，無法同步 " + displayName);
         }
+    }
+
+    private void performDataSync(String userId, String key, String value, String displayName) {
+        databaseReference.child(userId).child(key).setValue(value)
+            .addOnSuccessListener(aVoid -> 
+                notifyUser(displayName + " 已同步至 Firebase")
+            )
+            .addOnFailureListener(e -> 
+                notifyUser(displayName + " 同步失敗: " + e.getMessage())
+            );
+    }
+
+    private void notifyUser(String message) {
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 }
