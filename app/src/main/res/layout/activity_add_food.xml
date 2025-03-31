@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AddFoodActivity"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:fitsSystemWindows="true">
 
     <!-- 確保 ID 與 AddFoodActivity 中的代碼一致 -->
     <LinearLayout

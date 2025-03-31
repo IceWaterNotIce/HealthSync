@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".BMIHistoryActivity"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:fitsSystemWindows="true">
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/lineChartBMI"
