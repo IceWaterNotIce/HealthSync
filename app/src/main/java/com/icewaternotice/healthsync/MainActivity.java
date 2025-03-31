@@ -15,6 +15,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -78,6 +86,9 @@ public class MainActivity extends BaseActivity {
         TextView usageDaysTextView = findViewById(R.id.usageDaysTextView);
         String usageDays = calculateUsageDays();
         usageDaysTextView.setText(getString(R.string.usage_days_message, usageDays));
+
+        // 從 Firebase 獲取運動目標卡路里
+        fetchSportTargetKcal();
 
         // 計算並顯示今日所需卡路里
         calculateAndDisplayCaloriesToEat();
@@ -285,6 +296,36 @@ public class MainActivity extends BaseActivity {
         } catch (NumberFormatException e) {
             Log.e("MainActivity", "Error parsing BMR value: " + bmrStr, e);
             Toast.makeText(this, getString(R.string.error_calculating_calories), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void fetchSportTargetKcal() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users")
+                    .child(currentUser.getUid()).child("SportTargetKcal");
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        int targetKcal = snapshot.getValue(Integer.class);
+                        SharedPreferences sharedPreferences = getSharedPreferences("SportPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putInt("targetKcal", targetKcal);
+                        editor.apply();
+                        Toast.makeText(MainActivity.this, "運動目標卡路里已從雲端同步", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "雲端數據不存在", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(MainActivity.this, "同步失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Toast.makeText(this, "用戶未登錄，無法從雲端獲取數據", Toast.LENGTH_SHORT).show();
         }
     }
 }
