@@ -14,11 +14,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
 import java.util.Calendar;
 
 public class SettingActivity extends BaseActivity {
 
     private GoogleSignInClient googleSignInClient;
+    private FirebaseAuth firebaseAuth;
     private static final int RC_SIGN_IN = 100;
 
     @Override
@@ -36,9 +42,13 @@ public class SettingActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         // Configure Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id)) // Use your Firebase Web Client ID
                 .requestEmail()
                 .build();
         googleSignInClient = GoogleSignIn.getClient(this, gso);
+
+        // Initialize Firebase Auth
+        firebaseAuth = FirebaseAuth.getInstance();
 
         // Set up UI elements
         Button btnLinkGoogleAccount = findViewById(R.id.btnLinkGoogleAccount);
@@ -46,9 +56,9 @@ public class SettingActivity extends BaseActivity {
         ImageView imgProfilePicture = findViewById(R.id.imgProfilePicture);
 
         // Check if already signed in
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account != null) {
-            displayAccountInfo(account, txtAccountInfo, imgProfilePicture);
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            displayFirebaseUserInfo(currentUser, txtAccountInfo, imgProfilePicture);
             btnLinkGoogleAccount.setText("Unlink Google Account");
         } else {
             btnLinkGoogleAccount.setText("Link Google Account");
@@ -56,9 +66,9 @@ public class SettingActivity extends BaseActivity {
 
         // Handle button click for Google Sign-In/Sign-Out
         btnLinkGoogleAccount.setOnClickListener(v -> {
-            GoogleSignInAccount currentAccount = GoogleSignIn.getLastSignedInAccount(this);
-            if (currentAccount != null) {
+            if (firebaseAuth.getCurrentUser() != null) {
                 // Unlink account
+                firebaseAuth.signOut();
                 googleSignInClient.signOut().addOnCompleteListener(task -> {
                     txtAccountInfo.setText("No account linked.");
                     imgProfilePicture.setImageResource(R.drawable.default_profile_picture); // Fallback image
@@ -100,22 +110,44 @@ public class SettingActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            task.addOnCompleteListener(this, completedTask -> {
-                TextView txtAccountInfo = findViewById(R.id.txtAccountInfo);
-                ImageView imgProfilePicture = findViewById(R.id.imgProfilePicture);
-                Button btnLinkGoogleAccount = findViewById(R.id.btnLinkGoogleAccount);
-                if (completedTask.isSuccessful()) {
-                    GoogleSignInAccount account = completedTask.getResult();
-                    if (account != null) {
-                        displayAccountInfo(account, txtAccountInfo, imgProfilePicture);
-                        btnLinkGoogleAccount.setText("Unlink Google Account");
-                    } else {
-                        txtAccountInfo.setText("Account retrieval failed: Account is null.");
-                    }
-                } else {
-                    txtAccountInfo.setText("Account retrieval failed: " + completedTask.getException().getMessage());
+            if (task.isSuccessful()) {
+                GoogleSignInAccount account = task.getResult();
+                if (account != null) {
+                    firebaseAuthWithGoogle(account);
                 }
-            });
+            } else {
+                Toast.makeText(this, "Google Sign-In failed.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private void firebaseAuthWithGoogle(GoogleSignInAccount account) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(account.getIdToken(), null);
+        firebaseAuth.signInWithCredential(credential).addOnCompleteListener(this, task -> {
+            if (task.isSuccessful()) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    TextView txtAccountInfo = findViewById(R.id.txtAccountInfo);
+                    ImageView imgProfilePicture = findViewById(R.id.imgProfilePicture);
+                    Button btnLinkGoogleAccount = findViewById(R.id.btnLinkGoogleAccount);
+                    displayFirebaseUserInfo(user, txtAccountInfo, imgProfilePicture);
+                    btnLinkGoogleAccount.setText("Unlink Google Account");
+                }
+            } else {
+                Toast.makeText(this, "Firebase Authentication failed.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void displayFirebaseUserInfo(FirebaseUser user, TextView txtAccountInfo, ImageView imgProfilePicture) {
+        String accountInfo = "Name: " + user.getDisplayName() + "\nEmail: " + user.getEmail();
+        txtAccountInfo.setText(accountInfo);
+
+        // Load profile image
+        if (user.getPhotoUrl() != null) {
+            Glide.with(this).load(user.getPhotoUrl()).into(imgProfilePicture);
+        } else {
+            imgProfilePicture.setImageResource(R.drawable.default_profile_picture); // Fallback image
         }
     }
 
