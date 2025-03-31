@@ -51,6 +51,7 @@ public class SettingActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_setting); // 確保設置正確的佈局
         userDataSyncManager = new UserDataSyncManager(this);
 
         // Configure Google Sign-In
@@ -70,7 +71,10 @@ public class SettingActivity extends BaseActivity {
         Button btnLinkGoogleAccount = findViewById(R.id.btnLinkGoogleAccount);
         TextView txtAccountInfo = findViewById(R.id.txtAccountInfo);
         ImageView imgProfilePicture = findViewById(R.id.imgProfilePicture);
-        progressBar = findViewById(R.id.progressBar); // 假設在佈局中添加了一個進度條
+        progressBar = findViewById(R.id.progressBar); // 確保佈局中有 progressBar 元件
+        if (progressBar == null) {
+            throw new IllegalStateException("進度條 (progressBar) 未在佈局中定義，請檢查 activity_setting.xml");
+        }
         progressBar.setVisibility(View.GONE); // 默認隱藏
 
         // Add display name editing functionality
