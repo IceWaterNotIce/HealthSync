@@ -8,6 +8,10 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class AddFoodActivity extends AppCompatActivity {
 
@@ -64,5 +68,19 @@ public class AddFoodActivity extends AppCompatActivity {
         String newRecord = dateTime + " - " + foodName + " - " + calories + " kcal\n";
         editor.putString("records", existingRecords + newRecord);
         editor.apply();
+
+        // 同步到 Firebase
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users")
+                    .child(currentUser.getUid()).child("FoodRecords");
+            databaseReference.setValue(existingRecords + newRecord)
+                .addOnSuccessListener(aVoid -> Toast.makeText(this, "記錄已同步", Toast.LENGTH_SHORT).show())
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "同步失敗，請檢查 Firebase 權限設置: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+        } else {
+            Toast.makeText(this, "用戶未登錄，無法同步記錄", Toast.LENGTH_SHORT).show();
+        }
     }
 }

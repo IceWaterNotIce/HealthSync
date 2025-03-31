@@ -17,6 +17,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 import com.github.mikephil.charting.formatter.ValueFormatter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class FoodHistoryActivity extends AppCompatActivity {
 
@@ -102,17 +106,44 @@ public class FoodHistoryActivity extends AppCompatActivity {
     }
 
     private void loadFoodHistory(TextView historyTextView) {
-        SharedPreferences sharedPreferences = getSharedPreferences("FoodRecords", MODE_PRIVATE);
-        String records = sharedPreferences.getString("records", "尚無記錄");
-        historyTextView.setText(records);
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users")
+                    .child(currentUser.getUid()).child("FoodRecords");
+            databaseReference.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult().exists()) {
+                    String records = task.getResult().getValue(String.class);
+                    historyTextView.setText(records != null ? records : "尚無記錄");
+                } else {
+                    Toast.makeText(this, "無法讀取記錄，請檢查 Firebase 權限設置", Toast.LENGTH_SHORT).show();
+                    historyTextView.setText("尚無記錄");
+                }
+            }).addOnFailureListener(e -> {
+                Toast.makeText(this, "讀取失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        } else {
+            Toast.makeText(this, "用戶未登錄，無法讀取記錄", Toast.LENGTH_SHORT).show();
+            historyTextView.setText("尚無記錄");
+        }
     }
 
     private void deleteFoodHistory(TextView historyTextView) {
-        SharedPreferences sharedPreferences = getSharedPreferences("FoodRecords", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.remove("records");
-        editor.apply();
-        historyTextView.setText("尚無記錄");
-        Toast.makeText(this, "歷史記錄已刪除", Toast.LENGTH_SHORT).show();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users")
+                    .child(currentUser.getUid()).child("FoodRecords");
+            databaseReference.removeValue().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    historyTextView.setText("尚無記錄");
+                    Toast.makeText(this, "歷史記錄已刪除", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "刪除失敗，請檢查 Firebase 權限設置", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnFailureListener(e -> {
+                Toast.makeText(this, "刪除失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        } else {
+            Toast.makeText(this, "用戶未登錄，無法刪除記錄", Toast.LENGTH_SHORT).show();
+        }
     }
 }
