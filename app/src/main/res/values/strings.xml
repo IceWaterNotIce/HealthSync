@@ -1,3 +1,22 @@
 <resources>
     <string name="app_name">HealthSync</string>
+    <string name="loading_message">正在加載，請稍候...</string>
+    <string name="target_bmi_message">建議目標 BMI: %1$s</string>
+    <string name="bmr_message">您的 BMR: %1$s kcal</string>
+    <string name="not_set">未設定</string>
+    <string name="gender">性別</string>
+    <string name="birthday">生日</string>
+    <string name="height">身高</string>
+    <string name="weight">體重</string>
+    <string name="cannot_calculate_missing_data">無法計算 (缺少資料)</string>
+    <string name="cannot_calculate_invalid_data">無法計算 (資料格式錯誤)</string>
+    <string name="cannot_suggest_no_history">無法建議 (尚無歷史記錄)</string>
+    <string name="cannot_suggest_invalid_format">無法建議 (記錄格式錯誤)</string>
+    <string name="suggest_bmi_increase">18.5 (增重建議)</string>
+    <string name="suggest_bmi_decrease">22.0 (減重建議)</string>
+    <string name="suggest_bmi_maintain">保持現狀</string>
+    <string name="no_food_records_suggestion">尚無飲食記錄。建議每餐攝取 500-700 kcal，並保持 4 小時的間隔。</string>
+    <string name="invalid_record_format">記錄格式錯誤，無法建議</string>
+    <string name="next_meal_suggestion">距離上次進食已過 %1$d 小時。建議下一餐攝取 %2$d kcal，並在 %3$d 小時內進食。</string>
+    <string name="cannot_parse_record_time">無法解析記錄時間，請檢查記錄格式。</string>
 </resources>

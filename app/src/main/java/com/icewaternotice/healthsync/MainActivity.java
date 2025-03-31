@@ -1,11 +1,12 @@
 package com.icewaternotice.healthsync;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View; // 修正導入 View 的問題
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.Locale;
 
 public class MainActivity extends BaseActivity {
+    private ProgressDialog progressDialog;
 
     @Override
     protected int getLayoutResourceId() {
@@ -25,24 +27,31 @@ public class MainActivity extends BaseActivity {
 
     @Override
     protected int getCurrentMenuItemId() {
-        return R.id.nav_home; // Ensure this matches the "Home" menu item ID
+        return R.id.nav_home;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // 初始化進度條
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage(getString(R.string.loading_message));
+        progressDialog.setCancelable(false);
+
+        showProgressDialog();
         syncUserData(); // Sync user data when the app opens
-        
+        hideProgressDialog();
+
         // 顯示目標 BMI
         TextView targetBMITextView = findViewById(R.id.targetBMITextView);
         String targetBMI = calculateTargetBMI();
-        targetBMITextView.setText("建議目標 BMI: " + targetBMI);
+        targetBMITextView.setText(getString(R.string.target_bmi_message, targetBMI));
 
         // 顯示 BMR
-        TextView bmrTextView = findViewById(R.id.bmrTextView); // 確保在 XML 中新增此 TextView
+        TextView bmrTextView = findViewById(R.id.bmrTextView);
         String bmr = calculateBMR();
-        bmrTextView.setText("您的 BMR: " + bmr + " kcal");
+        bmrTextView.setText(getString(R.string.bmr_message, bmr));
 
         // 請求權限
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
@@ -53,34 +62,43 @@ public class MainActivity extends BaseActivity {
         suggestionTextView.setText(suggestion);
 
         // 確保在應用啟動時正確顯示建議
-        suggestionTextView.post(new Runnable() {
-            @Override
-            public void run() {
-                String suggestion = suggestNextMeal();
-                suggestionTextView.setText(suggestion);
-            }
-        });
+        suggestionTextView.post(() -> suggestionTextView.setText(suggestNextMeal()));
+    }
 
+    private void showProgressDialog() {
+        if (progressDialog != null && !progressDialog.isShowing()) {
+            progressDialog.show();
+        }
+    }
 
+    private void hideProgressDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+    }
+
+    private String getSharedPreferenceValue(String key, String defaultValue) {
+        try {
+            SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+            return sharedPreferences.getString(key, defaultValue);
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 
     private void syncUserData() {
         UserDataSyncManager userDataSyncManager = new UserDataSyncManager(this);
-        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
 
-        // Sync gender
-        String gender = sharedPreferences.getString("gender", "未設定");
-        userDataSyncManager.syncData("gender", gender, "性別");
+        String gender = getSharedPreferenceValue("gender", getString(R.string.not_set));
+        userDataSyncManager.syncData("gender", gender, getString(R.string.gender));
 
-        // Sync birthday
-        String birthday = sharedPreferences.getString("birthday", "未設定");
-        userDataSyncManager.syncData("birthday", birthday, "生日");
+        String birthday = getSharedPreferenceValue("birthday", getString(R.string.not_set));
+        userDataSyncManager.syncData("birthday", birthday, getString(R.string.birthday));
 
-        // Sync height and weight
-        String height = sharedPreferences.getString("height", "未設定");
-        String weight = sharedPreferences.getString("weight", "未設定");
-        userDataSyncManager.syncData("height", height, "Height");
-        userDataSyncManager.syncData("weight", weight, "Weight");
+        String height = getSharedPreferenceValue("height", getString(R.string.not_set));
+        String weight = getSharedPreferenceValue("weight", getString(R.string.not_set));
+        userDataSyncManager.syncData("height", height, getString(R.string.height));
+        userDataSyncManager.syncData("weight", weight, getString(R.string.weight));
     }
 
     @Override
@@ -92,108 +110,98 @@ public class MainActivity extends BaseActivity {
         suggestionTextView.setText(suggestion);
     }
 
-    // 計算目標 BMI
     private String calculateTargetBMI() {
         SharedPreferences sharedPreferences = getSharedPreferences("BMIHistoryPrefs", MODE_PRIVATE);
-        // 修正鍵名，確保正確讀取 BMI 歷史記錄
         String bmiHistory = sharedPreferences.getString("bmiHistory", "");
 
         if (bmiHistory.isEmpty()) {
-            return "無法建議 (尚無歷史記錄)";
+            return getString(R.string.cannot_suggest_no_history);
         }
 
         try {
             String[] records = bmiHistory.split("\n");
             String lastRecord = records[records.length - 1].trim();
             if (!lastRecord.contains("BMI: ")) {
-                return "無法建議 (記錄格式錯誤)";
+                return getString(R.string.cannot_suggest_invalid_format);
             }
 
             String bmiValue = lastRecord.split("BMI: ")[1].trim();
             double lastBMI = Double.parseDouble(bmiValue);
 
             if (lastBMI < 18.5) {
-                return "18.5 (增重建議)";
+                return getString(R.string.suggest_bmi_increase);
             } else if (lastBMI > 24.9) {
-                return "22.0 (減重建議)";
+                return getString(R.string.suggest_bmi_decrease);
             } else {
-                return "保持現狀";
+                return getString(R.string.suggest_bmi_maintain);
             }
         } catch (Exception e) {
-            return "無法建議 (記錄格式錯誤)";
+            return getString(R.string.cannot_suggest_invalid_format);
         }
     }
 
     private String calculateBMR() {
-        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        String heightStr = sharedPreferences.getString("height", "");
-        String weightStr = sharedPreferences.getString("weight", "");
-        String birthdayStr = sharedPreferences.getString("birthday", ""); // 假設生日格式為 "yyyy-MM-dd"
-        String ageStr = "";
+        String heightStr = getSharedPreferenceValue("height", "");
+        String weightStr = getSharedPreferenceValue("weight", "");
+        String birthdayStr = getSharedPreferenceValue("birthday", "");
+        String gender = getSharedPreferenceValue("gender", "male");
 
-        if (!birthdayStr.isEmpty()) {
-            try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            Date birthday = sdf.parse(birthdayStr);
-            Date today = new Date();
-
-            long ageInMillis = today.getTime() - birthday.getTime();
-            int age = (int) (ageInMillis / (1000L * 60 * 60 * 24 * 365));
-            ageStr = String.valueOf(age);
-            } catch (Exception e) {
-            ageStr = ""; // 如果生日格式錯誤，保持 ageStr 為空
-            }
-        }
-        String gender = sharedPreferences.getString("gender", "male"); // 預設為男性
-
-        if (heightStr.isEmpty() || weightStr.isEmpty() || ageStr.isEmpty()) {
-            return "無法計算 (缺少資料)";
+        if (heightStr.isEmpty() || weightStr.isEmpty() || birthdayStr.isEmpty()) {
+            return getString(R.string.cannot_calculate_missing_data);
         }
 
         try {
             double height = Double.parseDouble(heightStr);
             double weight = Double.parseDouble(weightStr);
-            int age = Integer.parseInt(ageStr);
+            int age = calculateAge(birthdayStr);
 
-            double bmr;
-            if (gender.equalsIgnoreCase("male")) {
-                bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
-            } else {
-                bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
-            }
+            double bmr = gender.equalsIgnoreCase("male")
+                    ? 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age)
+                    : 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
 
             return String.format(Locale.getDefault(), "%.2f", bmr);
-        } catch (NumberFormatException e) {
-            return "無法計算 (資料格式錯誤)";
+        } catch (Exception e) {
+            return getString(R.string.cannot_calculate_invalid_data);
         }
     }
 
-    // 改進建議文字的表達
+    private int calculateAge(String birthdayStr) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date birthday = sdf.parse(birthdayStr);
+            Date today = new Date();
+            long ageInMillis = today.getTime() - birthday.getTime();
+            return (int) (ageInMillis / (1000L * 60 * 60 * 24 * 365));
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     private String suggestNextMeal() {
         SharedPreferences sharedPreferences = getSharedPreferences("FoodRecords", MODE_PRIVATE);
         String records = sharedPreferences.getString("records", "").trim();
 
         if (records.isEmpty()) {
-            return "尚無飲食記錄。建議每餐攝取 500-700 kcal，並保持 4 小時的間隔。";
+            return getString(R.string.no_food_records_suggestion);
         }
 
         String[] recordArray = records.split("\n");
         String lastRecord = recordArray[recordArray.length - 1].trim();
 
         if (!lastRecord.contains(" - ")) {
-            return "記錄格式錯誤或記錄為空，無法建議";
+            return getString(R.string.invalid_record_format);
         }
 
         String[] lastRecordParts = lastRecord.split(" - ");
         if (lastRecordParts.length < 3) {
-            return "記錄格式錯誤，無法建議";
+            return getString(R.string.invalid_record_format);
         }
 
         String lastTime = lastRecordParts[0].trim();
         String lastCalories = lastRecordParts[2].replaceAll("[^0-9]", "").trim();
 
         if (lastTime.isEmpty() || lastCalories.isEmpty()) {
-            return "記錄格式錯誤，無法建議";
+            return getString(R.string.invalid_record_format);
         }
 
         try {
@@ -206,9 +214,9 @@ public class MainActivity extends BaseActivity {
                 suggestedCalories += 100;
             }
 
-            return "距離上次進食已過 " + timeSinceLastMeal + " 小時。建議下一餐攝取 " + suggestedCalories + " kcal，並在 " + Math.max(0, 4 - timeSinceLastMeal) + " 小時內進食。";
+            return getString(R.string.next_meal_suggestion, timeSinceLastMeal, suggestedCalories, Math.max(0, 4 - timeSinceLastMeal));
         } catch (Exception e) {
-            return "無法解析記錄時間，請檢查記錄格式。";
+            return getString(R.string.cannot_parse_record_time);
         }
     }
 }
