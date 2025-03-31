@@ -37,6 +37,11 @@ public class MainActivity extends BaseActivity {
         String targetBMI = calculateTargetBMI();
         targetBMITextView.setText("建議目標 BMI: " + targetBMI);
 
+        // 顯示 BMR
+        TextView bmrTextView = findViewById(R.id.bmrTextView); // 確保在 XML 中新增此 TextView
+        String bmr = calculateBMR();
+        bmrTextView.setText("您的 BMR: " + bmr + " kcal");
+
         // 請求權限
         ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
 
@@ -93,6 +98,50 @@ public class MainActivity extends BaseActivity {
             }
         } catch (Exception e) {
             return "無法建議 (記錄格式錯誤)";
+        }
+    }
+
+    private String calculateBMR() {
+        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        String heightStr = sharedPreferences.getString("height", "");
+        String weightStr = sharedPreferences.getString("weight", "");
+        String birthdayStr = sharedPreferences.getString("birthday", ""); // 假設生日格式為 "yyyy-MM-dd"
+        String ageStr = "";
+
+        if (!birthdayStr.isEmpty()) {
+            try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            Date birthday = sdf.parse(birthdayStr);
+            Date today = new Date();
+
+            long ageInMillis = today.getTime() - birthday.getTime();
+            int age = (int) (ageInMillis / (1000L * 60 * 60 * 24 * 365));
+            ageStr = String.valueOf(age);
+            } catch (Exception e) {
+            ageStr = ""; // 如果生日格式錯誤，保持 ageStr 為空
+            }
+        }
+        String gender = sharedPreferences.getString("gender", "male"); // 預設為男性
+
+        if (heightStr.isEmpty() || weightStr.isEmpty() || ageStr.isEmpty()) {
+            return "無法計算 (缺少資料)";
+        }
+
+        try {
+            double height = Double.parseDouble(heightStr);
+            double weight = Double.parseDouble(weightStr);
+            int age = Integer.parseInt(ageStr);
+
+            double bmr;
+            if (gender.equalsIgnoreCase("male")) {
+                bmr = 88.362 + (13.397 * weight) + (4.799 * height) - (5.677 * age);
+            } else {
+                bmr = 447.593 + (9.247 * weight) + (3.098 * height) - (4.330 * age);
+            }
+
+            return String.format(Locale.getDefault(), "%.2f", bmr);
+        } catch (NumberFormatException e) {
+            return "無法計算 (資料格式錯誤)";
         }
     }
 

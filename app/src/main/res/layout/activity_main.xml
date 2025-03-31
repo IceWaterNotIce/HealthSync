@@ -16,6 +16,18 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- 新增顯示 BMR 的 TextView -->
+            <TextView
+                android:id="@+id/bmrTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="您的 BMR: "
+                android:textSize="18sp"
+                android:textColor="#333333"
+                android:padding="8dp"
+                android:background="#FFFFFF"
+                android:elevation="2dp" />
+
             <TextView
                 android:id="@+id/targetBMITextView"
                 android:layout_width="match_parent"
