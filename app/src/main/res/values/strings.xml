@@ -20,4 +20,8 @@
     <string name="next_meal_suggestion">距離上次進食已過 %1$d 小時。建議下一餐攝取 %2$d kcal，並在 %3$d 小時內進食。</string>
     <string name="cannot_parse_record_time">無法解析記錄時間，請檢查記錄格式。</string>
     <string name="usage_days_message">您已使用此應用 %1$s 天。</string>
+    <string name="invalid_target_sport_calories">無效的運動目標卡路里，請檢查您的設定。</string>
+    <string name="unable_to_calculate_bmr">無法計算 BMR，請檢查您的資料。</string>
+    <string name="calories_to_eat_message">您今天需要攝取的卡路里: %.2f kcal</string>
+    <string name="error_calculating_calories">計算卡路里時發生錯誤，請檢查您的資料。</string>
 </resources>
