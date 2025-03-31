@@ -75,6 +75,9 @@ public class MainActivity extends BaseActivity {
         TextView usageDaysTextView = findViewById(R.id.usageDaysTextView);
         String usageDays = calculateUsageDays();
         usageDaysTextView.setText(getString(R.string.usage_days_message, usageDays));
+
+        // 計算並顯示今日所需卡路里
+        calculateAndDisplayCaloriesToEat();
     }
 
     private void showProgressDialog() {
@@ -250,5 +253,23 @@ public class MainActivity extends BaseActivity {
             e.printStackTrace();
             return "0";
         }
+    }
+
+    private void calculateAndDisplayCaloriesToEat() {
+        SharedPreferences sharedPreferences = getSharedPreferences("SportPrefs", MODE_PRIVATE);
+        int targetSportKcal = sharedPreferences.getInt("targetKcal", 0);
+
+        String bmrStr = calculateBMR(); // Assuming calculateBMR() returns a String
+        if (bmrStr.equals(getString(R.string.cannot_calculate_missing_data)) || 
+            bmrStr.equals(getString(R.string.cannot_calculate_invalid_data))) {
+            Toast.makeText(this, "Unable to calculate BMR. Please check your data.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double bmr = Double.parseDouble(bmrStr);
+        double caloriesToEat = bmr + targetSportKcal;
+
+        TextView caloriesToEatTextView = findViewById(R.id.caloriesToEatTextView);
+        caloriesToEatTextView.setText(String.format(Locale.getDefault(), "您今天需要攝取的卡路里: %.2f kcal", caloriesToEat));
     }
 }
