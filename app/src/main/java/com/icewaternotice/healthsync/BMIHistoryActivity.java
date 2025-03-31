@@ -35,7 +35,7 @@ public class BMIHistoryActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bmi_history);
+    
 
         LineChart lineChart = findViewById(R.id.lineChartBMI);
         ListView bmiHistoryList = findViewById(R.id.bmi_history_list);
