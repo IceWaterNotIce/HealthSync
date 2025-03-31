@@ -12,9 +12,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.content.SharedPreferences;
 
 public class StepCounterActivity extends BaseActivity implements SensorEventListener {
-
 
         @Override
         protected int getLayoutResourceId() {
@@ -29,6 +29,10 @@ public class StepCounterActivity extends BaseActivity implements SensorEventList
     private Sensor stepCounterSensor;
     private TextView stepCountTextView;
     private int initialStepCount = -1; // 用於儲存初始步數
+
+    private static final String PREFS_NAME = "StepCounterPrefs";
+    private static final String PREF_INITIAL_STEPS = "initialSteps";
+    private SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +56,9 @@ public class StepCounterActivity extends BaseActivity implements SensorEventList
                 requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, 1);
             }
         }
+
+        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        initialStepCount = sharedPreferences.getInt(PREF_INITIAL_STEPS, -1);
     }
 
     @Override
@@ -81,6 +88,7 @@ public class StepCounterActivity extends BaseActivity implements SensorEventList
         if (sensorManager != null) {
             sensorManager.unregisterListener(this);
         }
+        sharedPreferences.edit().putInt(PREF_INITIAL_STEPS, initialStepCount).apply(); // 儲存初始步數
     }
 
     @Override
@@ -88,7 +96,8 @@ public class StepCounterActivity extends BaseActivity implements SensorEventList
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
             int totalSteps = (int) event.values[0];
             if (initialStepCount == -1) {
-                initialStepCount = totalSteps; // 儲存初始步數
+                initialStepCount = totalSteps;
+                sharedPreferences.edit().putInt(PREF_INITIAL_STEPS, initialStepCount).apply(); // 儲存初始步數
             }
             int stepsSinceStart = totalSteps - initialStepCount;
             stepCountTextView.setText("Steps: " + stepsSinceStart); // 顯示步數
