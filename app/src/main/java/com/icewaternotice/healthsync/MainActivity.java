@@ -66,16 +66,24 @@ public class MainActivity extends BaseActivity {
 
     // 計算目標 BMI
     private String calculateTargetBMI() {
-        SharedPreferences sharedPreferences = getSharedPreferences("BMIRecords", MODE_PRIVATE);
-        // 修正鍵名，確保正確讀取 BMI 記錄
-        String lastBMIRecord = sharedPreferences.getString("lastBMI", "");
+        SharedPreferences sharedPreferences = getSharedPreferences("BMIHistoryPrefs", MODE_PRIVATE);
+        // 修正鍵名，確保正確讀取 BMI 歷史記錄
+        String bmiHistory = sharedPreferences.getString("bmiHistory", "");
 
-        if (lastBMIRecord.isEmpty()) {
+        if (bmiHistory.isEmpty()) {
             return "無法建議 (尚無歷史記錄)";
         }
 
         try {
-            double lastBMI = Double.parseDouble(lastBMIRecord);
+            String[] records = bmiHistory.split("\n");
+            String lastRecord = records[records.length - 1].trim();
+            if (!lastRecord.contains("BMI: ")) {
+                return "無法建議 (記錄格式錯誤)";
+            }
+
+            String bmiValue = lastRecord.split("BMI: ")[1].trim();
+            double lastBMI = Double.parseDouble(bmiValue);
+
             if (lastBMI < 18.5) {
                 return "18.5 (增重建議)";
             } else if (lastBMI > 24.9) {
@@ -83,7 +91,7 @@ public class MainActivity extends BaseActivity {
             } else {
                 return "保持現狀";
             }
-        } catch (NumberFormatException e) {
+        } catch (Exception e) {
             return "無法建議 (記錄格式錯誤)";
         }
     }
