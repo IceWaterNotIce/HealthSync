@@ -22,7 +22,16 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class FoodHistoryActivity extends AppCompatActivity {
+public class FoodHistoryActivity extends BaseActivity {
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_food_history;
+    }
+
+    @Override
+    protected int getCurrentMenuItemId() {
+        return R.id.nav_food;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -20,7 +20,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class BMIHistoryActivity extends AppCompatActivity {
+public class BMIHistoryActivity extends BaseActivity {
+
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_bmi_history;
+    }
+
+    @Override
+    protected int getCurrentMenuItemId() {
+        return R.id.nav_bmi;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -28,7 +28,16 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class PhotoKcalActivity extends AppCompatActivity {
+public class PhotoKcalActivity extends BaseActivity {
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_setting;
+    }
+
+    @Override
+    protected int getCurrentMenuItemId() {
+        return R.id.nav_setting;
+    }
 
     private ImageView imageView;
     private TextView textViewResponse;

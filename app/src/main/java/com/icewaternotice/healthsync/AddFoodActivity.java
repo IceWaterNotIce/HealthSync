@@ -13,7 +13,16 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class AddFoodActivity extends AppCompatActivity {
+public class AddFoodActivity extends BaseActivity {
+    @Override
+    protected int getLayoutResourceId() {
+        return R.layout.activity_add_food;
+    }
+
+    @Override
+    protected int getCurrentMenuItemId() {
+        return R.id.nav_food;
+    }
 
     private EditText editTextFoodName, editTextCalories;
 

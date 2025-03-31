@@ -10,7 +10,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class StepCounterActivity extends AppCompatActivity implements SensorEventListener {
+public class StepCounterActivity extends BaseActivity implements SensorEventListener {
+
+
+        @Override
+        protected int getLayoutResourceId() {
+            return R.layout.activity_setting;
+        }
+    
+        @Override
+        protected int getCurrentMenuItemId() {
+            return R.id.nav_setting;
+        }
     private SensorManager sensorManager;
     private Sensor stepCounterSensor;
     private TextView stepCountTextView;
