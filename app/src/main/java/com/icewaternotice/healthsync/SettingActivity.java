@@ -92,6 +92,24 @@ public class SettingActivity extends BaseActivity {
             }
         });
 
+        // Listen for changes in display name
+        if (currentUser != null) {
+            databaseReference.child(currentUser.getUid()).child("displayName").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    String updatedDisplayName = snapshot.getValue(String.class);
+                    if (updatedDisplayName != null) {
+                        txtDisplayName.setText(updatedDisplayName);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(SettingActivity.this, "顯示名稱更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
         // Check if already signed in
         if (currentUser != null) {
             displayFirebaseUserInfo(currentUser, txtAccountInfo, imgProfilePicture);
@@ -267,6 +285,11 @@ public class SettingActivity extends BaseActivity {
         if (currentUser != null) {
             databaseReference.child(currentUser.getUid()).child(key).setValue(value)
                 .addOnSuccessListener(aVoid -> {
+                    if (key.equals("displayName")) {
+                        currentUser.updateProfile(new UserProfileChangeRequest.Builder()
+                                .setDisplayName(value)
+                                .build());
+                    }
                     Toast.makeText(this, displayName + "已同步至 Firebase", Toast.LENGTH_SHORT).show();
                     updateUIAfterSave();
                 })
@@ -312,6 +335,9 @@ public class SettingActivity extends BaseActivity {
                     .build())
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
+                        TextView txtAccountInfo = findViewById(R.id.txtAccountInfo);
+                        String updatedAccountInfo = "Name: " + newDisplayName + "\nEmail: " + currentUser.getEmail();
+                        txtAccountInfo.setText(updatedAccountInfo);
                         Toast.makeText(this, "顯示名稱已更新", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(this, "顯示名稱更新失敗: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
