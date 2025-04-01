@@ -171,8 +171,8 @@ public class SettingActivity extends BaseActivity {
         btnSelectBirthday.setOnClickListener(v -> showDatePickerDialog(txtBirthdayInfo));
 
         // 性別與生日監聽器
-        addDatabaseValueEventListener("gender", R.id.txtGenderInfo, "目前性別: ");
-        addDatabaseValueEventListener("birthday", R.id.txtBirthdayInfo, "生日: ");
+        userDataSyncManager.addDatabaseValueEventListener("gender", R.id.txtGenderInfo, "目前性別: ", this);
+        userDataSyncManager.addDatabaseValueEventListener("birthday", R.id.txtBirthdayInfo, "生日: ", this);
     }
 
     @Override
@@ -241,29 +241,7 @@ public class SettingActivity extends BaseActivity {
         userDataSyncManager.saveUserPreference("birthday", birthday, R.id.txtBirthdayInfo, "生日: ", this);
     }
 
-    private void addDatabaseValueEventListener(String childKey, int textViewId, String prefix) {
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        if (currentUser != null) {
-            databaseReference.child(currentUser.getUid()).child(childKey)
-                .addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot snapshot) {
-                        String updatedValue = snapshot.getValue(String.class);
-                        if (updatedValue != null) {
-                            TextView textView = findViewById(textViewId);
-                            textView.setText(prefix + updatedValue);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError error) {
-                        showError(prefix + "更新失敗: " + error.getMessage());
-                    }
-                });
-        }
-    }
-
-    private void showError(String message) {
+    protected void showError(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 

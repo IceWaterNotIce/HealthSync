@@ -7,7 +7,10 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Map;
@@ -49,6 +52,28 @@ public class UserDataSyncManager {
 
         syncData(key, value, displayPrefix.replace("目前", ""));
         activity.updateUIAfterSave();
+    }
+
+    public void addDatabaseValueEventListener(String childKey, int textViewId, String prefix, SettingActivity activity) {
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            databaseReference.child(currentUser.getUid()).child(childKey)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        String updatedValue = snapshot.getValue(String.class);
+                        if (updatedValue != null) {
+                            TextView textView = activity.findViewById(textViewId);
+                            textView.setText(prefix + updatedValue);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        activity.showError(prefix + "更新失敗: " + error.getMessage());
+                    }
+                });
+        }
     }
 
     private FirebaseUser getCurrentUser() {
