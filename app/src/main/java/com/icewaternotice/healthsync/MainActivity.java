@@ -104,6 +104,12 @@ public class MainActivity extends BaseActivity {
 
         // 監聽步數變化
         listenToStepCountChanges();
+
+        // Listen for changes in weight and height
+        listenToUserDataChanges();
+
+        // Listen for changes in sport target
+        listenToSportTargetChanges();
     }
 
     private void showProgressDialog() {
@@ -221,5 +227,71 @@ public class MainActivity extends BaseActivity {
                 }
             });
         }
+    }
+
+    private void listenToUserDataChanges() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users").child(currentUser.getUid());
+
+            userRef.child("height").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    refreshBMIAndBMR();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(MainActivity.this, "監聽身高變化失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            userRef.child("weight").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    refreshBMIAndBMR();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(MainActivity.this, "監聽體重變化失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private void listenToSportTargetChanges() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference sportTargetRef = FirebaseDatabase.getInstance().getReference("users")
+                    .child(currentUser.getUid()).child("SportTargetKcal");
+
+            sportTargetRef.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    CalculationUtils.calculateAndDisplayCaloriesToEat(MainActivity.this, findViewById(R.id.caloriesToEatTextView));
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(MainActivity.this, "監聽運動目標卡路里變化失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private void refreshBMIAndBMR() {
+        // Refresh BMI suggestion
+        TextView targetBMITextView = findViewById(R.id.targetBMITextView);
+        String targetBMI = CalculationUtils.calculateTargetBMI(this);
+        targetBMITextView.setText(getString(R.string.target_bmi_message, targetBMI));
+
+        // Refresh BMR
+        TextView bmrTextView = findViewById(R.id.bmrTextView);
+        String bmr = CalculationUtils.calculateBMR(this);
+        bmrTextView.setText(getString(R.string.bmr_message, bmr));
+
+        // Refresh required calories
+        CalculationUtils.calculateAndDisplayCaloriesToEat(this, findViewById(R.id.caloriesToEatTextView));
     }
 }
