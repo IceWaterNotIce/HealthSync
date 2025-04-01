@@ -283,8 +283,20 @@ public class MainActivity extends BaseActivity {
     private void refreshBMIAndBMR() {
         // Refresh BMI suggestion
         TextView targetBMITextView = findViewById(R.id.targetBMITextView);
-        String targetBMI = CalculationUtils.calculateTargetBMI(this);
-        targetBMITextView.setText(getString(R.string.target_bmi_message, targetBMI));
+        String height = getSharedPreferenceValue("height", "");
+        String weight = getSharedPreferenceValue("weight", "");
+
+        if (!height.isEmpty() && !weight.isEmpty()) {
+            try {
+                float bmi = CalculationUtils.calculateBMI(height, weight);
+                String bmiCategory = CalculationUtils.getBMICategory(bmi);
+                targetBMITextView.setText(getString(R.string.target_bmi_message, String.format("%.2f (%s)", bmi, bmiCategory)));
+            } catch (NumberFormatException e) {
+                targetBMITextView.setText(getString(R.string.invalid_bmi_data));
+            }
+        } else {
+            targetBMITextView.setText(getString(R.string.missing_bmi_data));
+        }
 
         // Refresh BMR
         TextView bmrTextView = findViewById(R.id.bmrTextView);

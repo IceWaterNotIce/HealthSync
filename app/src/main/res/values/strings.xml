@@ -31,4 +31,6 @@
     <string name="sync_failure"> 同步失敗</string>
     <string name="sync_all_success">所有數據已同步至 Firebase</string>
     <string name="sync_all_failure">批量同步失敗</string>
+    <string name="invalid_bmi_data">Invalid BMI data. Please check your input.</string>
+    <string name="missing_bmi_data">Missing BMI data. Please provide height and weight.</string>
 </resources>

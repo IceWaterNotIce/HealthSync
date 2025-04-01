@@ -73,31 +73,6 @@ public class BMICalculatorActivity extends BaseActivity {
         userDataSyncManager.addDatabaseValueEventListener("weight", R.id.etWeight, "", this, errorMessage -> 
             Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
         );
-        userDataSyncManager.addDatabaseValueEventListener("bmi", R.id.tvBMIResult, "Your BMI: ", this, errorMessage -> 
-            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
-        );
-
-        // Log BMI history (no UI element to display it directly)
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        if (currentUser != null) {
-            databaseReference.child(currentUser.getUid()).child("bmiHistory")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot snapshot) {
-                        String bmiHistory = snapshot.getValue(String.class);
-                        if (bmiHistory != null) {
-                            Log.d("BMICalculatorActivity", "Loaded BMI History: " + bmiHistory);
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(DatabaseError error) {
-                        Log.e("BMICalculatorActivity", "Failed to load BMI history: " + error.getMessage());
-                    }
-                });
-        } else {
-            Toast.makeText(this, "User not logged in. Cannot load data.", Toast.LENGTH_SHORT).show();
-        }
 
         // Handle BMI calculation
         btnCalculateBMI.setOnClickListener(new View.OnClickListener() {
@@ -113,15 +88,9 @@ public class BMICalculatorActivity extends BaseActivity {
 
                 try {
                     float bmi = CalculationUtils.calculateBMI(heightStr, weightStr);
-                    saveHeightAndWeight(heightStr, weightStr);
-
                     String bmiCategory = CalculationUtils.getBMICategory(bmi);
                     String result = String.format("Your BMI: %.2f (%s)", bmi, bmiCategory);
                     tvBMIResult.setText(result);
-
-                    // Save BMI to history
-                    saveBMIToHistory(bmi);
-
                 } catch (NumberFormatException e) {
                     Toast.makeText(BMICalculatorActivity.this, "Invalid input. Please enter valid numbers.", Toast.LENGTH_SHORT).show();
                 }
@@ -145,35 +114,9 @@ public class BMICalculatorActivity extends BaseActivity {
         editor.putString("height", height);
         editor.putString("weight", weight);
         editor.apply();
-        Toast.makeText(this, "Height and weight saved.", Toast.LENGTH_SHORT).show();
 
-        // Sync height and weight to Firebase
+        // Sync only height and weight to Firebase
         userDataSyncManager.syncData("height", height, "Height");
         userDataSyncManager.syncData("weight", weight, "Weight");
-    }
-
-    private void saveBMIToHistory(float bmi) {
-        SharedPreferences sharedPreferences = getSharedPreferences("BMIHistoryPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-
-        // Get the current date
-        String currentDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(new Date());
-
-        // Append the new BMI record to the existing history
-        String existingHistory = sharedPreferences.getString("bmiHistory", "");
-        String newRecord = currentDate + " - BMI: " + String.format("%.2f", bmi);
-        String updatedHistory = existingHistory.isEmpty() ? newRecord : existingHistory + "\n" + newRecord;
-
-        editor.putString("bmiHistory", updatedHistory);
-        editor.apply();
-
-        // Sync BMI and BMI history to Firebase
-        userDataSyncManager.syncData("bmi", String.format("%.2f", bmi), "BMI");
-        userDataSyncManager.syncData("bmiHistory", updatedHistory, "BMI History");
-
-        // Log the updated history for debugging
-        Log.d("BMICalculatorActivity", "Updated BMI History: " + updatedHistory);
-
-        Toast.makeText(this, "BMI saved to history.", Toast.LENGTH_SHORT).show();
     }
 }
