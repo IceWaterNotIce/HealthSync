@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.icewaternotice.healthsync.utils.CalculationUtils; // Import the utility class
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -144,23 +145,10 @@ public class BMICalculatorActivity extends BaseActivity {
                 }
 
                 try {
-                    float height = Float.parseFloat(heightStr) / 100; // Convert cm to meters
-                    float weight = Float.parseFloat(weightStr);
-                    float bmi = weight / (height * height);
-
+                    float bmi = CalculationUtils.calculateBMI(heightStr, weightStr);
                     saveHeightAndWeight(heightStr, weightStr);
 
-                    String bmiCategory;
-                    if (bmi < 18.5) {
-                        bmiCategory = "Underweight";
-                    } else if (bmi >= 18.5 && bmi < 24.9) {
-                        bmiCategory = "Normal weight";
-                    } else if (bmi >= 25 && bmi < 29.9) {
-                        bmiCategory = "Overweight";
-                    } else {
-                        bmiCategory = "Obesity";
-                    }
-
+                    String bmiCategory = CalculationUtils.getBMICategory(bmi);
                     String result = String.format("Your BMI: %.2f (%s)", bmi, bmiCategory);
                     tvBMIResult.setText(result);
 
