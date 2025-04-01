@@ -275,29 +275,6 @@ public class SettingActivity extends BaseActivity {
         userDataSyncManager.saveUserPreference("birthday", birthday, R.id.txtBirthdayInfo, "生日: ", this);
     }
 
-    private void syncWithFirebase(String key, String value, String displayName) {
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        if (currentUser != null) {
-            databaseReference.child(currentUser.getUid()).child(key).setValue(value)
-                    .addOnSuccessListener(aVoid -> {
-                        if (key.equals("displayName")) {
-                            currentUser.updateProfile(new UserProfileChangeRequest.Builder()
-                                    .setDisplayName(value)
-                                    .build());
-                        }
-                        Toast.makeText(this, displayName + "已同步至 Firebase", Toast.LENGTH_SHORT).show();
-                        updateUIAfterSave();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, displayName + "同步失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        updateUIAfterSave();
-                    });
-        } else {
-            Toast.makeText(this, "用戶未登錄，無法同步 " + displayName, Toast.LENGTH_SHORT).show();
-            updateUIAfterSave();
-        }
-    }
-
     protected void updateUIBeforeSave() {
         progressBar.setVisibility(View.VISIBLE);
     }
