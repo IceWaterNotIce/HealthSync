@@ -15,51 +15,62 @@ public class UserDataSyncManager {
     private final FirebaseAuth firebaseAuth;
     private final Context context;
 
-    public UserDataSyncManager(Context context) {
+    public UserDataSyncManager(Context context, FirebaseAuth firebaseAuth, DatabaseReference databaseReference) {
         this.context = context;
-        this.firebaseAuth = FirebaseAuth.getInstance();
-        this.databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        this.firebaseAuth = firebaseAuth;
+        this.databaseReference = databaseReference;
     }
 
     public void syncData(String key, String value, String displayName) {
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        FirebaseUser currentUser = getCurrentUser();
         if (currentUser != null) {
             performDataSync(currentUser.getUid(), key, value, displayName);
-        } else {
-            notifyUser("用戶未登錄，無法同步 " + displayName);
         }
     }
 
     public void syncAllData(Map<String, String> dataMap) {
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        FirebaseUser currentUser = getCurrentUser();
         if (currentUser != null) {
             performBatchDataSync(currentUser.getUid(), dataMap);
-        } else {
-            notifyUser("用戶未登錄，無法同步所有數據");
         }
+    }
+
+    private FirebaseUser getCurrentUser() {
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser == null) {
+            notifyUser(context.getString(R.string.error_user_not_logged_in));
+        }
+        return currentUser;
     }
 
     private void performDataSync(String userId, String key, String value, String displayName) {
         databaseReference.child(userId).child(key).setValue(value)
             .addOnSuccessListener(aVoid -> 
-                notifyUser(displayName + " 已同步至 Firebase")
+                notifyUser(displayName + context.getString(R.string.sync_success))
             )
-            .addOnFailureListener(e -> 
-                notifyUser(displayName + " 同步失敗: " + e.getMessage())
-            );
+            .addOnFailureListener(e -> {
+                logError("Data sync failed for key: " + key, e);
+                notifyUser(displayName + context.getString(R.string.sync_failure));
+            });
     }
 
     private void performBatchDataSync(String userId, Map<String, String> dataMap) {
         databaseReference.child(userId).setValue(dataMap)
             .addOnSuccessListener(aVoid -> 
-                notifyUser("所有數據已同步至 Firebase")
+                notifyUser(context.getString(R.string.sync_all_success))
             )
-            .addOnFailureListener(e -> 
-                notifyUser("批量同步失敗: " + e.getMessage())
-            );
+            .addOnFailureListener(e -> {
+                logError("Batch data sync failed", e);
+                notifyUser(context.getString(R.string.sync_all_failure));
+            });
     }
 
     private void notifyUser(String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void logError(String message, Exception e) {
+        // Log the error (use your preferred logging library)
+        // Example: Log.e("UserDataSyncManager", message, e);
     }
 }

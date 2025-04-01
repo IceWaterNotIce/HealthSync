@@ -53,7 +53,9 @@ public class SettingActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
        
-        userDataSyncManager = new UserDataSyncManager(this);
+        firebaseAuth = FirebaseAuth.getInstance();
+        databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        userDataSyncManager = new UserDataSyncManager(this, firebaseAuth, databaseReference);
 
         // Configure Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

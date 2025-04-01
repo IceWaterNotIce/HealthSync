@@ -26,4 +26,9 @@
     <string name="error_calculating_calories">計算卡路里時發生錯誤，請檢查您的資料。</string>
     <string name="steps_display">Steps: %1$d</string>
     <string name="sensor_data_invalid">Sensor data is invalid!</string>
+    <string name="error_user_not_logged_in">用戶未登錄，無法同步數據</string>
+    <string name="sync_success"> 已同步至 Firebase</string>
+    <string name="sync_failure"> 同步失敗</string>
+    <string name="sync_all_success">所有數據已同步至 Firebase</string>
+    <string name="sync_all_failure">批量同步失敗</string>
 </resources>

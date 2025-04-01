@@ -46,7 +46,7 @@ public class BMICalculatorActivity extends BaseActivity {
         // Initialize Firebase Auth and Database Reference
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("users");
-        userDataSyncManager = new UserDataSyncManager(this);
+        userDataSyncManager = new UserDataSyncManager(this, firebaseAuth, databaseReference);
 
         EditText etHeight = findViewById(R.id.etHeight);
         EditText etWeight = findViewById(R.id.etWeight);

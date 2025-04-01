@@ -52,8 +52,12 @@ public class MainActivity extends BaseActivity {
         progressDialog.setMessage(getString(R.string.loading_message));
         progressDialog.setCancelable(false);
 
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
+        UserDataSyncManager userDataSyncManager = new UserDataSyncManager(this, firebaseAuth, databaseReference);
+
         showProgressDialog();
-        syncUserData(); // Sync user data when the app opens
+        syncUserData(userDataSyncManager); // Sync user data when the app opens
         hideProgressDialog();
 
         // 顯示目標 BMI
@@ -123,9 +127,7 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void syncUserData() {
-        UserDataSyncManager userDataSyncManager = new UserDataSyncManager(this);
-
+    private void syncUserData(UserDataSyncManager userDataSyncManager) {
         String gender = getSharedPreferenceValue("gender", getString(R.string.not_set));
         userDataSyncManager.syncData("gender", gender, getString(R.string.gender));
 
