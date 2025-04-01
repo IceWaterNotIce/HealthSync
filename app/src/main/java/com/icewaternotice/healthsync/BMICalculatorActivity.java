@@ -66,68 +66,35 @@ public class BMICalculatorActivity extends BaseActivity {
             etWeight.setText(savedWeight);
         }
 
-        // Load data from Firebase
+        // Load data from Firebase using UserDataSyncManager
+        userDataSyncManager.addDatabaseValueEventListener("height", R.id.etHeight, "", this, errorMessage -> 
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        );
+        userDataSyncManager.addDatabaseValueEventListener("weight", R.id.etWeight, "", this, errorMessage -> 
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        );
+        userDataSyncManager.addDatabaseValueEventListener("bmi", R.id.tvBMIResult, "Your BMI: ", this, errorMessage -> 
+            Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show()
+        );
+
+        // Log BMI history (no UI element to display it directly)
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {
-            databaseReference.child(currentUser.getUid()).child("height").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    String height = snapshot.getValue(String.class);
-                    if (height != null) {
-                        etHeight.setText(height);
+            databaseReference.child(currentUser.getUid()).child("bmiHistory")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        String bmiHistory = snapshot.getValue(String.class);
+                        if (bmiHistory != null) {
+                            Log.d("BMICalculatorActivity", "Loaded BMI History: " + bmiHistory);
+                        }
                     }
-                }
 
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    Log.e("BMICalculatorActivity", "Failed to load height: " + error.getMessage());
-                }
-            });
-
-            databaseReference.child(currentUser.getUid()).child("weight").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    String weight = snapshot.getValue(String.class);
-                    if (weight != null) {
-                        etWeight.setText(weight);
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        Log.e("BMICalculatorActivity", "Failed to load BMI history: " + error.getMessage());
                     }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    Log.e("BMICalculatorActivity", "Failed to load weight: " + error.getMessage());
-                }
-            });
-
-            databaseReference.child(currentUser.getUid()).child("bmi").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    String bmi = snapshot.getValue(String.class);
-                    if (bmi != null) {
-                        tvBMIResult.setText("Your BMI: " + bmi);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    Log.e("BMICalculatorActivity", "Failed to load BMI: " + error.getMessage());
-                }
-            });
-
-            databaseReference.child(currentUser.getUid()).child("bmiHistory").addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    String bmiHistory = snapshot.getValue(String.class);
-                    if (bmiHistory != null) {
-                        Log.d("BMICalculatorActivity", "Loaded BMI History: " + bmiHistory);
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    Log.e("BMICalculatorActivity", "Failed to load BMI history: " + error.getMessage());
-                }
-            });
+                });
         } else {
             Toast.makeText(this, "User not logged in. Cannot load data.", Toast.LENGTH_SHORT).show();
         }

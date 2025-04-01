@@ -171,8 +171,12 @@ public class SettingActivity extends BaseActivity {
         btnSelectBirthday.setOnClickListener(v -> showDatePickerDialog(txtBirthdayInfo));
 
         // 性別與生日監聽器
-        userDataSyncManager.addDatabaseValueEventListener("gender", R.id.txtGenderInfo, "目前性別: ", this);
-        userDataSyncManager.addDatabaseValueEventListener("birthday", R.id.txtBirthdayInfo, "生日: ", this);
+        userDataSyncManager.addDatabaseValueEventListener("gender", R.id.txtGenderInfo, "目前性別: ", this, errorMessage -> 
+            showError(errorMessage)
+        );
+        userDataSyncManager.addDatabaseValueEventListener("birthday", R.id.txtBirthdayInfo, "生日: ", this, errorMessage -> 
+            showError(errorMessage)
+        );
     }
 
     @Override

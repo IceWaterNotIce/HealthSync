@@ -54,7 +54,7 @@ public class UserDataSyncManager {
         activity.updateUIAfterSave();
     }
 
-    public void addDatabaseValueEventListener(String childKey, int textViewId, String prefix, SettingActivity activity) {
+    public void addDatabaseValueEventListener(String childKey, int textViewId, String prefix, BaseActivity activity, OnErrorCallback errorCallback) {
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {
             databaseReference.child(currentUser.getUid()).child(childKey)
@@ -70,10 +70,14 @@ public class UserDataSyncManager {
 
                     @Override
                     public void onCancelled(DatabaseError error) {
-                        activity.showError(prefix + "更新失敗: " + error.getMessage());
+                        errorCallback.onError(prefix + "更新失敗: " + error.getMessage());
                     }
                 });
         }
+    }
+
+    public interface OnErrorCallback {
+        void onError(String errorMessage);
     }
 
     private FirebaseUser getCurrentUser() {
