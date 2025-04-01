@@ -1,6 +1,8 @@
 package com.icewaternotice.healthsync;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,6 +35,20 @@ public class UserDataSyncManager {
         if (currentUser != null) {
             performBatchDataSync(currentUser.getUid(), dataMap);
         }
+    }
+
+    public void saveUserPreference(String key, String value, int textViewId, String displayPrefix, SettingActivity activity) {
+        activity.updateUIBeforeSave();
+        SharedPreferences sharedPreferences = activity.getSharedPreferences("UserPrefs", SettingActivity.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(key, value);
+        editor.apply();
+
+        TextView textView = activity.findViewById(textViewId);
+        textView.setText(displayPrefix + value);
+
+        syncData(key, value, displayPrefix.replace("目前", ""));
+        activity.updateUIAfterSave();
     }
 
     private FirebaseUser getCurrentUser() {

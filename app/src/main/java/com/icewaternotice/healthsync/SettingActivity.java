@@ -53,7 +53,7 @@ public class SettingActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-       
+
         firebaseAuth = FirebaseAuth.getInstance();
         databaseReference = FirebaseDatabase.getInstance().getReference("users");
         userDataSyncManager = new UserDataSyncManager(this, firebaseAuth, databaseReference);
@@ -105,20 +105,22 @@ public class SettingActivity extends BaseActivity {
 
         // Listen for changes in display name
         if (currentUser != null) {
-            databaseReference.child(currentUser.getUid()).child("displayName").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    String updatedDisplayName = snapshot.getValue(String.class);
-                    if (updatedDisplayName != null) {
-                        txtDisplayName.setText(updatedDisplayName);
-                    }
-                }
+            databaseReference.child(currentUser.getUid()).child("displayName")
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            String updatedDisplayName = snapshot.getValue(String.class);
+                            if (updatedDisplayName != null) {
+                                txtDisplayName.setText(updatedDisplayName);
+                            }
+                        }
 
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    Toast.makeText(SettingActivity.this, "顯示名稱更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                            Toast.makeText(SettingActivity.this, "顯示名稱更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    });
         }
 
         // Check if already signed in
@@ -171,35 +173,39 @@ public class SettingActivity extends BaseActivity {
 
         // Listen for changes in gender and birthday
         if (currentUser != null) {
-            databaseReference.child(currentUser.getUid()).child("gender").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    String updatedGender = snapshot.getValue(String.class);
-                    if (updatedGender != null) {
-                        txtGenderInfo.setText("目前性別: " + updatedGender);
-                    }
-                }
+            databaseReference.child(currentUser.getUid()).child("gender")
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            String updatedGender = snapshot.getValue(String.class);
+                            if (updatedGender != null) {
+                                txtGenderInfo.setText("目前性別: " + updatedGender);
+                            }
+                        }
 
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    Toast.makeText(SettingActivity.this, "性別更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                            Toast.makeText(SettingActivity.this, "性別更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    });
 
-            databaseReference.child(currentUser.getUid()).child("birthday").addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot snapshot) {
-                    String updatedBirthday = snapshot.getValue(String.class);
-                    if (updatedBirthday != null) {
-                        txtBirthdayInfo.setText("生日: " + updatedBirthday);
-                    }
-                }
+            databaseReference.child(currentUser.getUid()).child("birthday")
+                    .addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot snapshot) {
+                            String updatedBirthday = snapshot.getValue(String.class);
+                            if (updatedBirthday != null) {
+                                txtBirthdayInfo.setText("生日: " + updatedBirthday);
+                            }
+                        }
 
-                @Override
-                public void onCancelled(DatabaseError error) {
-                    Toast.makeText(SettingActivity.this, "生日更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                            Toast.makeText(SettingActivity.this, "生日更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    });
         }
     }
 
@@ -214,7 +220,8 @@ public class SettingActivity extends BaseActivity {
                     firebaseAuthWithGoogle(account);
                 }
             } else {
-                Toast.makeText(this, "Google Sign-In 失敗: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Google Sign-In 失敗: " + task.getException().getMessage(), Toast.LENGTH_SHORT)
+                        .show();
             }
         }
     }
@@ -239,7 +246,8 @@ public class SettingActivity extends BaseActivity {
         });
     }
 
-    private void displayUserInfo(String name, String email, Uri photoUrl, TextView txtAccountInfo, ImageView imgProfilePicture) {
+    private void displayUserInfo(String name, String email, Uri photoUrl, TextView txtAccountInfo,
+            ImageView imgProfilePicture) {
         String accountInfo = "Name: " + (name != null ? name : "N/A") + "\nEmail: " + (email != null ? email : "N/A");
         txtAccountInfo.setText(accountInfo);
 
@@ -255,60 +263,46 @@ public class SettingActivity extends BaseActivity {
     }
 
     private void displayAccountInfo(GoogleSignInAccount account, TextView txtAccountInfo, ImageView imgProfilePicture) {
-        displayUserInfo(account.getDisplayName(), account.getEmail(), account.getPhotoUrl(), txtAccountInfo, imgProfilePicture);
+        displayUserInfo(account.getDisplayName(), account.getEmail(), account.getPhotoUrl(), txtAccountInfo,
+                imgProfilePicture);
     }
 
     private void saveGender(String gender) {
-        updateUIBeforeSave();
-        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("gender", gender);
-        editor.apply();
-
-        TextView txtGenderInfo = findViewById(R.id.txtGenderInfo);
-        txtGenderInfo.setText("目前性別: " + gender);
-
-        userDataSyncManager.syncData("gender", gender, "性別");
+        userDataSyncManager.saveUserPreference("gender", gender, R.id.txtGenderInfo, "目前性別: ", this);
     }
 
     private void saveBirthday(String birthday) {
-        updateUIBeforeSave();
-        SharedPreferences sharedPreferences = getSharedPreferences("UserPrefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("birthday", birthday);
-        editor.apply();
-
-        userDataSyncManager.syncData("birthday", birthday, "生日");
+        userDataSyncManager.saveUserPreference("birthday", birthday, R.id.txtBirthdayInfo, "生日: ", this);
     }
 
     private void syncWithFirebase(String key, String value, String displayName) {
         FirebaseUser currentUser = firebaseAuth.getCurrentUser();
         if (currentUser != null) {
             databaseReference.child(currentUser.getUid()).child(key).setValue(value)
-                .addOnSuccessListener(aVoid -> {
-                    if (key.equals("displayName")) {
-                        currentUser.updateProfile(new UserProfileChangeRequest.Builder()
-                                .setDisplayName(value)
-                                .build());
-                    }
-                    Toast.makeText(this, displayName + "已同步至 Firebase", Toast.LENGTH_SHORT).show();
-                    updateUIAfterSave();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, displayName + "同步失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    updateUIAfterSave();
-                });
+                    .addOnSuccessListener(aVoid -> {
+                        if (key.equals("displayName")) {
+                            currentUser.updateProfile(new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(value)
+                                    .build());
+                        }
+                        Toast.makeText(this, displayName + "已同步至 Firebase", Toast.LENGTH_SHORT).show();
+                        updateUIAfterSave();
+                    })
+                    .addOnFailureListener(e -> {
+                        Toast.makeText(this, displayName + "同步失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        updateUIAfterSave();
+                    });
         } else {
             Toast.makeText(this, "用戶未登錄，無法同步 " + displayName, Toast.LENGTH_SHORT).show();
             updateUIAfterSave();
         }
     }
 
-    private void updateUIBeforeSave() {
+    protected void updateUIBeforeSave() {
         progressBar.setVisibility(View.VISIBLE);
     }
 
-    private void updateUIAfterSave() {
+    protected void updateUIAfterSave() {
         progressBar.setVisibility(View.GONE);
     }
 
@@ -318,11 +312,12 @@ public class SettingActivity extends BaseActivity {
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, selectedYear, selectedMonth, selectedDay) -> {
-            String birthday = selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay;
-            saveBirthday(birthday);
-            txtBirthdayInfo.setText("生日: " + birthday);
-        }, year, month, day);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                (view, selectedYear, selectedMonth, selectedDay) -> {
+                    String birthday = selectedYear + "-" + (selectedMonth + 1) + "-" + selectedDay;
+                    saveBirthday(birthday);
+                    txtBirthdayInfo.setText("生日: " + birthday);
+                }, year, month, day);
 
         datePickerDialog.show();
     }
@@ -334,17 +329,19 @@ public class SettingActivity extends BaseActivity {
             currentUser.updateProfile(new UserProfileChangeRequest.Builder()
                     .setDisplayName(newDisplayName)
                     .build())
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        TextView txtAccountInfo = findViewById(R.id.txtAccountInfo);
-                        String updatedAccountInfo = "Name: " + newDisplayName + "\nEmail: " + currentUser.getEmail();
-                        txtAccountInfo.setText(updatedAccountInfo);
-                        Toast.makeText(this, "顯示名稱已更新", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "顯示名稱更新失敗: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                    updateUIAfterSave();
-                });
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            TextView txtAccountInfo = findViewById(R.id.txtAccountInfo);
+                            String updatedAccountInfo = "Name: " + newDisplayName + "\nEmail: "
+                                    + currentUser.getEmail();
+                            txtAccountInfo.setText(updatedAccountInfo);
+                            Toast.makeText(this, "顯示名稱已更新", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(this, "顯示名稱更新失敗: " + task.getException().getMessage(), Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                        updateUIAfterSave();
+                    });
         }
     }
 }
