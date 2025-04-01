@@ -38,17 +38,17 @@ dependencies {
     implementation(libs.material)
     implementation(libs.activity)
     implementation(libs.constraintlayout)
-    implementation("com.github.PhilJay:MPAndroidChart:3.1.0") // 確保版本號正確
-    implementation("com.google.android.gms:play-services-auth:20.7.0") // 確保版本號正確
-    implementation("com.github.bumptech.glide:glide:4.15.1")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.15.1")
-    implementation("androidx.health.connect:connect-client:1.1.0-beta01") // 確保版本號正確
+    implementation(libs.mpandroidchart)
+    implementation(libs.play.services.auth)
+    implementation(libs.glide)
+    annotationProcessor(libs.compiler)
+    implementation(libs.connect.client)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation(platform("com.google.firebase:firebase-bom:33.11.0"))
-    implementation("com.google.firebase:firebase-analytics")
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.firebase:firebase-database")
-    implementation("androidx.health.connect:connect-client:1.1.0-alpha11")
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.database)
+    implementation(libs.connect.client.v110alpha11)
 }

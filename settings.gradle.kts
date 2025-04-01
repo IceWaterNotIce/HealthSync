@@ -6,8 +6,8 @@ pluginManagement {
         maven { url = uri("https://androidx.dev/storage/health-connect/") }
     }
     plugins {
-        id("com.android.application") version "8.6.0" apply false // 更新至 8.6.0
-        id("com.android.library") version "8.6.0" apply false // 更新至 8.6.0
+        id("com.android.application") version "8.6.1" apply false // 更新至 8.6.0
+        id("com.android.library") version "8.6.1" apply false // 更新至 8.6.0
         id("org.jetbrains.kotlin.android") version "2.1.10" apply false // 新增 Kotlin 插件
     }
 }

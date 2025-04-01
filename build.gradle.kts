@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         // Add AGP classpath here
-        classpath("com.android.tools.build:gradle:8.6.0")
+        classpath(libs.gradle)
     }
 }
 
