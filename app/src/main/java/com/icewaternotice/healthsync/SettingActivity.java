@@ -117,8 +117,7 @@ public class SettingActivity extends BaseActivity {
 
                         @Override
                         public void onCancelled(DatabaseError error) {
-                            Toast.makeText(SettingActivity.this, "顯示名稱更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT)
-                                    .show();
+                            showError("顯示名稱更新失敗: " + error.getMessage());
                         }
                     });
         }
@@ -171,42 +170,9 @@ public class SettingActivity extends BaseActivity {
 
         btnSelectBirthday.setOnClickListener(v -> showDatePickerDialog(txtBirthdayInfo));
 
-        // Listen for changes in gender and birthday
-        if (currentUser != null) {
-            databaseReference.child(currentUser.getUid()).child("gender")
-                    .addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            String updatedGender = snapshot.getValue(String.class);
-                            if (updatedGender != null) {
-                                txtGenderInfo.setText("目前性別: " + updatedGender);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError error) {
-                            Toast.makeText(SettingActivity.this, "性別更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT)
-                                    .show();
-                        }
-                    });
-
-            databaseReference.child(currentUser.getUid()).child("birthday")
-                    .addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot snapshot) {
-                            String updatedBirthday = snapshot.getValue(String.class);
-                            if (updatedBirthday != null) {
-                                txtBirthdayInfo.setText("生日: " + updatedBirthday);
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError error) {
-                            Toast.makeText(SettingActivity.this, "生日更新失敗: " + error.getMessage(), Toast.LENGTH_SHORT)
-                                    .show();
-                        }
-                    });
-        }
+        // 性別與生日監聽器
+        addDatabaseValueEventListener("gender", R.id.txtGenderInfo, "目前性別: ");
+        addDatabaseValueEventListener("birthday", R.id.txtBirthdayInfo, "生日: ");
     }
 
     @Override
@@ -275,12 +241,42 @@ public class SettingActivity extends BaseActivity {
         userDataSyncManager.saveUserPreference("birthday", birthday, R.id.txtBirthdayInfo, "生日: ", this);
     }
 
+    private void addDatabaseValueEventListener(String childKey, int textViewId, String prefix) {
+        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+        if (currentUser != null) {
+            databaseReference.child(currentUser.getUid()).child(childKey)
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot snapshot) {
+                        String updatedValue = snapshot.getValue(String.class);
+                        if (updatedValue != null) {
+                            TextView textView = findViewById(textViewId);
+                            textView.setText(prefix + updatedValue);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        showError(prefix + "更新失敗: " + error.getMessage());
+                    }
+                });
+        }
+    }
+
+    private void showError(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private void toggleProgressBarVisibility(boolean isVisible) {
+        progressBar.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+    }
+
     protected void updateUIBeforeSave() {
-        progressBar.setVisibility(View.VISIBLE);
+        toggleProgressBarVisibility(true);
     }
 
     protected void updateUIAfterSave() {
-        progressBar.setVisibility(View.GONE);
+        toggleProgressBarVisibility(false);
     }
 
     private void showDatePickerDialog(TextView txtBirthdayInfo) {
@@ -314,8 +310,7 @@ public class SettingActivity extends BaseActivity {
                             txtAccountInfo.setText(updatedAccountInfo);
                             Toast.makeText(this, "顯示名稱已更新", Toast.LENGTH_SHORT).show();
                         } else {
-                            Toast.makeText(this, "顯示名稱更新失敗: " + task.getException().getMessage(), Toast.LENGTH_SHORT)
-                                    .show();
+                            showError("顯示名稱更新失敗: " + task.getException().getMessage());
                         }
                         updateUIAfterSave();
                     });
