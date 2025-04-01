@@ -9,6 +9,12 @@
     <uses-permission android:name="android.permission.health.WRITE_HEART_RATE"/>
     <uses-permission android:name="android.permission.health.READ_STEPS"/>
     <uses-permission android:name="android.permission.health.WRITE_STEPS"/>
+    <uses-permission android:name="android.permission.health.READ_EXERCISE"/>
+    <uses-permission android:name="android.permission.health.WRITE_EXERCISE"/>
+    <uses-permission android:name="android.permission.health.READ_TOTAL_CALORIES_BURNED"/>
+    <uses-permission android:name="android.permission.health.WRITE_TOTAL_CALORIES_BURNED"/>
+    <uses-permission android:name="android.permission.health.READ_WEIGHT"/>
+    <uses-permission android:name="android.permission.health.WRITE_WEIGHT"/>
 
     <application
         android:allowBackup="true"
@@ -36,9 +42,18 @@
         <activity android:name=".PhotoKcalActivity" />
         <activity android:name=".FoodActivity" />
         <activity android:name=".BMIActivity" />
-        <activity android:name=".StepCounterActivity" />
+        <activity android:name=".StepCounterActivity"
+            android:exported="true">
+            <!-- 將 Health Connect 的 intent-filter 移到這裡 -->
+            <intent-filter>
+                <action android:name="androidx.health.ACTION_SHOW_PERMISSIONS_RATIONALE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW_PERMISSION_USAGE"/>
+                <category android:name="android.intent.category.HEALTH_PERMISSIONS"/>
+            </intent-filter>
+        </activity>
         <activity android:name=".SportActivity" />
         <activity android:name=".SettingActivity" />
     </application>
-
 </manifest>
