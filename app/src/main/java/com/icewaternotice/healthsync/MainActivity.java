@@ -92,6 +92,12 @@ public class MainActivity extends BaseActivity {
 
         // 計算並顯示今日所需卡路里
         calculateAndDisplayCaloriesToEat();
+
+        // 載入步數
+        loadStepCount();
+
+        // 監聽步數變化
+        listenToStepCountChanges();
     }
 
     private void showProgressDialog() {
@@ -326,6 +332,50 @@ public class MainActivity extends BaseActivity {
             });
         } else {
             Toast.makeText(this, "用戶未登錄，無法從雲端獲取數據", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void loadStepCount() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users")
+                    .child(currentUser.getUid()).child("StepCount");
+            databaseReference.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful() && task.getResult().exists()) {
+                    int steps = task.getResult().getValue(Integer.class);
+                    TextView stepCountTextView = findViewById(R.id.stepCountTextView);
+                    stepCountTextView.setText(getString(R.string.steps_display, steps));
+                } else {
+                    Toast.makeText(this, "無法載入步數，請檢查 Firebase 設定", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnFailureListener(e -> {
+                Toast.makeText(this, "載入步數失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        } else {
+            Toast.makeText(this, "用戶未登錄，無法載入步數", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void listenToStepCountChanges() {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users")
+                    .child(currentUser.getUid()).child("StepCount");
+            databaseReference.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        int steps = snapshot.getValue(Integer.class);
+                        TextView stepCountTextView = findViewById(R.id.stepCountTextView);
+                        stepCountTextView.setText(getString(R.string.steps_display, steps));
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError error) {
+                    Toast.makeText(MainActivity.this, "步數監聽失敗: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 }

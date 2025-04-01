@@ -13,6 +13,10 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.content.SharedPreferences;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class StepCounterActivity extends BaseActivity implements SensorEventListener {
 
@@ -104,10 +108,35 @@ public class StepCounterActivity extends BaseActivity implements SensorEventList
                 // 使用資源檔案中的字串資源來顯示步數
                 String stepText = getString(R.string.steps_display, stepsSinceStart);
                 stepCountTextView.setText(stepText); // 顯示步數
+
+                // 儲存步數到本地
+                sharedPreferences.edit().putInt(PREF_INITIAL_STEPS, initialStepCount).apply();
+
+                // 儲存步數到雲端
+                saveStepsToCloud(stepsSinceStart);
             } else {
                 // 處理無效數據的情況
                 Toast.makeText(this, R.string.sensor_data_invalid, Toast.LENGTH_SHORT).show();
             }
+        }
+    }
+
+    private void saveStepsToCloud(int steps) {
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentUser != null) {
+            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users")
+                    .child(currentUser.getUid()).child("StepCount");
+            databaseReference.setValue(steps).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(this, "步數已同步到雲端", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "步數同步失敗", Toast.LENGTH_SHORT).show();
+                }
+            }).addOnFailureListener(e -> {
+                Toast.makeText(this, "步數同步失敗: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        } else {
+            Toast.makeText(this, "用戶未登錄，無法同步步數", Toast.LENGTH_SHORT).show();
         }
     }
 
