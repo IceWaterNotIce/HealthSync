@@ -2,6 +2,7 @@ package com.icewaternotice.healthsync;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Button;
@@ -238,33 +239,23 @@ public class SettingActivity extends BaseActivity {
         });
     }
 
-    private void displayFirebaseUserInfo(FirebaseUser user, TextView txtAccountInfo, ImageView imgProfilePicture) {
-        String accountInfo = "Name: " + user.getDisplayName() + "\nEmail: " + user.getEmail();
+    private void displayUserInfo(String name, String email, Uri photoUrl, TextView txtAccountInfo, ImageView imgProfilePicture) {
+        String accountInfo = "Name: " + (name != null ? name : "N/A") + "\nEmail: " + (email != null ? email : "N/A");
         txtAccountInfo.setText(accountInfo);
 
-        // Load profile image
-        if (user.getPhotoUrl() != null) {
-            Glide.with(this).load(user.getPhotoUrl()).into(imgProfilePicture);
+        if (photoUrl != null) {
+            Glide.with(this).load(photoUrl).into(imgProfilePicture);
         } else {
             imgProfilePicture.setImageResource(R.drawable.default_profile_picture); // Fallback image
         }
     }
 
-    private void displayAccountInfo(GoogleSignInAccount account, TextView txtAccountInfo, ImageView imgProfilePicture) {
-        if (account != null) {
-            String accountInfo = "Name: " + account.getDisplayName() + "\nEmail: " + account.getEmail();
-            txtAccountInfo.setText(accountInfo);
+    private void displayFirebaseUserInfo(FirebaseUser user, TextView txtAccountInfo, ImageView imgProfilePicture) {
+        displayUserInfo(user.getDisplayName(), user.getEmail(), user.getPhotoUrl(), txtAccountInfo, imgProfilePicture);
+    }
 
-            // Load profile image
-            if (account.getPhotoUrl() != null) {
-                Glide.with(this).load(account.getPhotoUrl()).into(imgProfilePicture);
-            } else {
-                imgProfilePicture.setImageResource(R.drawable.default_profile_picture); // Fallback image
-            }
-        } else {
-            txtAccountInfo.setText("No account info available.");
-            imgProfilePicture.setImageResource(R.drawable.default_profile_picture); // Fallback image
-        }
+    private void displayAccountInfo(GoogleSignInAccount account, TextView txtAccountInfo, ImageView imgProfilePicture) {
+        displayUserInfo(account.getDisplayName(), account.getEmail(), account.getPhotoUrl(), txtAccountInfo, imgProfilePicture);
     }
 
     private void saveGender(String gender) {
