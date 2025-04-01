@@ -24,4 +24,6 @@
     <string name="unable_to_calculate_bmr">無法計算 BMR，請檢查您的資料。</string>
     <string name="calories_to_eat_message">您今天需要攝取的卡路里: %.2f kcal</string>
     <string name="error_calculating_calories">計算卡路里時發生錯誤，請檢查您的資料。</string>
+    <string name="steps_display">Steps: %1$d</string>
+    <string name="sensor_data_invalid">Sensor data is invalid!</string>
 </resources>

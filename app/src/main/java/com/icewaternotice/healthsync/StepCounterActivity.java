@@ -94,13 +94,20 @@ public class StepCounterActivity extends BaseActivity implements SensorEventList
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-            int totalSteps = (int) event.values[0];
-            if (initialStepCount == -1) {
-                initialStepCount = totalSteps;
-                sharedPreferences.edit().putInt(PREF_INITIAL_STEPS, initialStepCount).apply(); // 儲存初始步數
+            if (event.values != null && event.values.length > 0) {
+                int totalSteps = (int) event.values[0];
+                if (initialStepCount == -1) {
+                    initialStepCount = totalSteps; // 儲存初始步數
+                }
+                int stepsSinceStart = totalSteps - initialStepCount;
+
+                // 使用資源檔案中的字串資源來顯示步數
+                String stepText = getString(R.string.steps_display, stepsSinceStart);
+                stepCountTextView.setText(stepText); // 顯示步數
+            } else {
+                // 處理無效數據的情況
+                Toast.makeText(this, R.string.sensor_data_invalid, Toast.LENGTH_SHORT).show();
             }
-            int stepsSinceStart = totalSteps - initialStepCount;
-            stepCountTextView.setText("Steps: " + stepsSinceStart); // 顯示步數
         }
     }
 
